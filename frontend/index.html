@@ -1,28 +1,2412 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MK00</title>
-    <meta name="description" content="MK00 gym management" />
+<head><script type="application/json" data-od-external-dependencies>["https://api.fontshare.com/v2/css?f%5B%5D=general-sans@500,600,700&display=swap","https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"]</script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Iron Standard · Gym SaaS console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f%5B%5D=general-sans@500,600,700&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" />
+<style>
+/* ── Genesis tokens ─────────────────────────────────────────────────────
+   Bound from genesis-DESIGN.md. Hex source values converted to OKLCh.
+   No colour literal appears anywhere outside this block. */
+:root{
+  --bg:            oklch(0.984 0 0);          /* #FAFAFA */
+  --surface:       oklch(1 0 0);              /* #FFFFFF */
+  --fg:            oklch(0.145 0 0);          /* #0A0A0A */
+  --fg-2:          oklch(0.528 0 0);          /* #6B6B6B text secondary */
+  --muted:         oklch(0.692 0 0);          /* #9C9C9C neutral */
+  --border:        oklch(0.929 0.004 286);    /* #E8E8EC */
+  --accent:        oklch(0.585 0.233 277.1);  /* #6366F1 */
+  --accent-press:  oklch(0.511 0.262 277);    /* #4F46E5 */
+  --ok:            oklch(0.696 0.170 162.5);  /* #10B981 */
+  --warn:          oklch(0.769 0.188 70);     /* #F59E0B */
+  --bad:           oklch(0.637 0.237 25.3);   /* #EF4444 */
 
-    <!-- Typefaces named by genesis-DESIGN.md. General Sans ships from Fontshare,
-         DM Sans and JetBrains Mono from Google Fonts, which is where that document
-         says each is loaded from. display=swap so text is never invisible. -->
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://api.fontshare.com/v2/css?f%5B%5D=general-sans@400,500,700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  /* derived — colour-mix / OKLCh only, no new literals */
+  --accent-soft:  color-mix(in oklch, var(--accent) 10%, var(--surface));
+  --accent-ring:  color-mix(in oklch, var(--accent) 18%, transparent);
+  --bg-alt:       color-mix(in oklch, var(--fg) 5%, var(--surface));
+  --fg-soft:      color-mix(in oklch, var(--fg) 3.5%, transparent);
+  --ok-soft:      color-mix(in oklch, var(--ok) 13%, var(--surface));
+  --ok-ink:       oklch(0.47 0.115 162.5);
+  --warn-soft:    color-mix(in oklch, var(--warn) 16%, var(--surface));
+  --warn-ink:     oklch(0.49 0.118 66);
+  --bad-soft:     color-mix(in oklch, var(--bad) 12%, var(--surface));
+  --bad-ink:      oklch(0.505 0.196 25.3);
+
+  --font-display:'General Sans','DM Sans',system-ui,sans-serif;
+  --font-body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --r-chip:4px; --r-ctl:6px; --r-panel:8px; --r-card:12px; --r-pill:9999px;
+  --sh-hover:0 8px 30px color-mix(in oklch, var(--fg) 8%, transparent);
+  --sh-pop:0 16px 44px color-mix(in oklch, var(--fg) 14%, transparent);
+  --sh-glow:0 4px 12px color-mix(in oklch, var(--accent) 35%, transparent);
+  --nav-h:56px; --side-w:236px; --container:1280px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;color:inherit}
+p{margin:0;text-wrap:pretty}
+h1,h2,h3,h4{margin:0;font-family:var(--font-display);font-weight:700;letter-spacing:-0.03em;text-wrap:balance}
+table{border-collapse:collapse;width:100%}
+[hidden]{display:none !important}
+:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-ring);border-radius:var(--r-ctl)}
+
+/* ── type ──────────────────────────────────────────────────────────── */
+.t-display{font-family:var(--font-display);font-size:clamp(40px,5.4vw,60px);line-height:1.02;letter-spacing:-0.04em;font-weight:700}
+.t-h2,.t-h3,.t-h4{font-family:var(--font-display);text-wrap:balance}
+.t-h2{font-size:32px;line-height:1.15;font-weight:700;letter-spacing:-0.03em}
+.t-h3{font-size:24px;line-height:1.25;letter-spacing:-0.025em;font-weight:700}
+.t-h4{font-size:17px;line-height:1.35;letter-spacing:-0.015em;font-weight:600}
+.t-sm{font-size:13px;line-height:1.5}
+.t-cap{font-size:12px;line-height:1.45;color:var(--fg-2)}
+.t-over{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--fg-2)}
+.dim{color:var(--fg-2)}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.ep{font-family:var(--font-mono);font-size:11.5px;color:var(--fg-2);letter-spacing:0.01em}
+.ep b{font-weight:500;color:var(--fg)}
+
+/* ── buttons ───────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 16px;
+  border-radius:var(--r-ctl);border:1px solid transparent;background:transparent;font-size:14px;font-weight:500;
+  letter-spacing:-0.005em;white-space:nowrap;transition:transform .16s ease,background .16s ease,border-color .16s ease,box-shadow .16s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn svg{width:16px;height:16px;flex:none}
+.btn-sm{height:32px;padding:0 12px;font-size:13px}
+.btn-lg{height:44px;padding:0 22px;font-size:15px}
+.btn-primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-press);border-color:var(--accent-press);box-shadow:var(--sh-glow)}
+.btn-secondary{border-color:var(--border);color:var(--fg);background:var(--surface)}
+.btn-secondary:hover{border-color:var(--fg);background:var(--surface)}
+.btn-ghost{color:var(--fg-2);padding:0 10px}
+.btn-ghost:hover{color:var(--accent-press);background:var(--accent-soft)}
+.btn-danger{color:var(--bad-ink);border-color:color-mix(in oklch,var(--bad) 34%,var(--surface));background:var(--surface)}
+.btn-danger:hover{background:var(--bad-soft);border-color:var(--bad-ink)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-block{width:100%}
+.linky{color:var(--accent);font-weight:500;border-radius:2px}
+.linky:hover{color:var(--accent-press);text-decoration:underline;text-underline-offset:3px}
+
+/* ── surfaces ──────────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card)}
+.card-p{padding:24px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-panel);padding:16px}
+.lift{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.lift:hover{transform:translateY(-2px);box-shadow:var(--sh-hover);border-color:color-mix(in oklch,var(--fg) 14%,var(--border))}
+
+/* ── layout ────────────────────────────────────────────────────────── */
+.wrap{max-width:var(--container);margin-inline:auto;padding-inline:24px;width:100%}
+.row{display:flex;align-items:center;gap:12px}
+.row-b{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.col{display:flex;flex-direction:column}
+.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g16{gap:16px}.g20{gap:20px}.g24{gap:24px}.g32{gap:32px}
+.wrapz{flex-wrap:wrap}
+.grid{display:grid;gap:20px}
+.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-21{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.g-12{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
+.push{margin-left:auto}
+.sep{height:1px;background:var(--border);border:0;margin:0}
+
+/* ── appbar ────────────────────────────────────────────────────────── */
+.appbar{position:sticky;top:0;z-index:40;height:var(--nav-h);
+  background:color-mix(in oklch,var(--surface) 82%,transparent);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border)}
+.appbar-in{display:flex;align-items:center;gap:16px;height:var(--nav-h)}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:-0.03em}
+.brand-mk{width:26px;height:26px;border-radius:var(--r-ctl);background:var(--fg);color:var(--surface);
+  display:grid;place-items:center;font-size:12px;font-weight:700;letter-spacing:0}
+.tenant{font-family:var(--font-mono);font-size:11px;color:var(--fg-2);border:1px solid var(--border);
+  border-radius:var(--r-chip);padding:2px 7px;white-space:nowrap}
+.searchtrig{display:flex;align-items:center;gap:10px;height:34px;width:min(320px,34vw);padding:0 10px 0 12px;
+  background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r-card);color:var(--fg-2);font-size:13px;text-align:left}
+.searchtrig:hover{border-color:var(--fg-2);color:var(--fg)}
+.searchtrig svg{width:15px;height:15px;flex:none}
+.kbd{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;border:1px solid var(--border);
+  border-radius:var(--r-chip);padding:1px 5px;background:var(--surface);color:var(--fg-2)}
+.avatar{width:30px;height:30px;border-radius:var(--r-pill);display:grid;place-items:center;flex:none;
+  background:var(--bg-alt);border:1px solid var(--border);font-family:var(--font-mono);font-size:11px;font-weight:500;color:var(--fg)}
+.avatar-lg{width:44px;height:44px;font-size:14px}
+.usrbtn{display:flex;align-items:center;gap:9px;height:38px;padding:0 8px 0 4px;border-radius:var(--r-ctl);border:1px solid transparent;background:transparent}
+.usrbtn:hover{background:var(--bg-alt);border-color:var(--border)}
+.usrbtn .caret{width:14px;height:14px;color:var(--fg-2)}
+.menu{position:absolute;top:calc(100% + 6px);right:0;min-width:236px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-panel);box-shadow:var(--sh-pop);padding:6px;z-index:60}
+.menu-hd{padding:10px 10px 12px}
+.menu-it{display:flex;align-items:center;gap:10px;width:100%;height:36px;padding:0 10px;border:0;background:transparent;
+  border-radius:var(--r-ctl);font-size:14px;text-align:left}
+.menu-it:hover{background:var(--bg-alt)}
+.menu-it.is-bad{color:var(--bad-ink)}
+.menu-it.is-bad:hover{background:var(--bad-soft)}
+.hamb{display:none;width:38px;height:38px;border:1px solid var(--border);border-radius:var(--r-ctl);background:var(--surface);place-items:center}
+.hamb svg{width:17px;height:17px}
+
+/* ── shell / sidenav ───────────────────────────────────────────────── */
+.shell{display:grid;grid-template-columns:var(--side-w) minmax(0,1fr);gap:32px;align-items:start}
+.sidenav{position:sticky;top:calc(var(--nav-h) + 24px);display:flex;flex-direction:column;gap:20px;padding-bottom:24px}
+.navgrp{display:flex;flex-direction:column;gap:2px}
+.navgrp .t-over{padding:0 10px 6px}
+.navit{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px;border-radius:var(--r-ctl);
+  font-size:14px;font-weight:500;color:var(--fg-2);border:1px solid transparent;background:transparent;width:100%;text-align:left}
+.navit svg{width:16px;height:16px;flex:none}
+.navit:hover{background:var(--bg-alt);color:var(--fg)}
+.navit[aria-current="page"]{background:var(--accent-soft);color:var(--accent-press);border-color:color-mix(in oklch,var(--accent) 22%,transparent)}
+.navit .cnt{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--fg-2)}
+.navit[aria-current="page"] .cnt{color:var(--accent-press)}
+.seatbox{border:1px solid var(--border);border-radius:var(--r-panel);padding:12px;background:var(--surface)}
+.meter{height:6px;border-radius:var(--r-pill);background:var(--bg-alt);overflow:hidden;margin-top:8px}
+.meter>i{display:block;height:100%;border-radius:var(--r-pill);background:var(--fg)}
+.meter.is-warn>i{background:var(--warn)}
+.meter.is-bad>i{background:var(--bad)}
+
+/* ── screens ───────────────────────────────────────────────────────── */
+.main{min-width:0;padding:24px 0 80px}
+.scr{display:none}
+.scr.on{display:block}
+.scrhead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.scrhead h1{font-size:32px;line-height:1.12;letter-spacing:-0.035em}
+.scrhead .sub{margin-top:6px}
+
+/* ── banners ───────────────────────────────────────────────────────── */
+.banner{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:var(--r-panel);
+  border:1px solid var(--border);background:var(--surface);margin-bottom:20px}
+.banner svg{width:18px;height:18px;flex:none;margin-top:2px}
+.banner .btn{flex:none}
+.banner.is-warn{background:var(--warn-soft);border-color:color-mix(in oklch,var(--warn) 34%,var(--surface));color:var(--warn-ink)}
+.banner.is-bad{background:var(--bad-soft);border-color:color-mix(in oklch,var(--bad) 32%,var(--surface));color:var(--bad-ink)}
+.banner.is-info{background:var(--accent-soft);border-color:color-mix(in oklch,var(--accent) 24%,var(--surface));color:var(--accent-press)}
+.banner strong{font-weight:500}
+.banner p{color:inherit}
+.banner .b-sub{opacity:.86;font-size:13px;margin-top:2px}
+
+/* ── chips ─────────────────────────────────────────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:var(--r-pill);
+  background:var(--bg-alt);color:var(--fg-2);font-size:12px;font-weight:500;white-space:nowrap}
+.chip.on{background:var(--fg);color:var(--surface)}
+.chip-ok{background:var(--ok-soft);color:var(--ok-ink)}
+.chip-warn{background:var(--warn-soft);color:var(--warn-ink)}
+.chip-bad{background:var(--bad-soft);color:var(--bad-ink)}
+.chip-dot::before{content:"";width:6px;height:6px;border-radius:var(--r-pill);background:currentColor;flex:none}
+.filt{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:var(--r-pill);
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-2);font-size:13px;font-weight:500}
+.filt:hover{color:var(--fg);border-color:var(--fg-2)}
+.filt[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--surface)}
+.filt[aria-pressed="true"]:hover{color:var(--surface);border-color:var(--fg)}
+
+/* ── KPI ───────────────────────────────────────────────────────────── */
+.kpi{padding:18px 20px}
+.kpi .k-lab{display:flex;align-items:center;gap:8px;color:var(--fg-2);font-size:13px}
+.kpi .k-num{font-family:var(--font-display);font-weight:700;font-size:34px;line-height:1.1;letter-spacing:-0.035em;margin-top:10px;font-variant-numeric:tabular-nums}
+.kpi .k-num small{font-size:15px;font-weight:500;color:var(--fg-2);letter-spacing:-0.01em}
+.kpi .k-foot{margin-top:6px;font-size:12.5px;color:var(--fg-2)}
+
+/* ── bar chart (filled encoding) ───────────────────────────────────── */
+.bars{display:flex;align-items:flex-end;gap:14px;height:150px;padding-top:8px}
+.bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;min-width:0}
+.bars .b i{display:block;border-radius:var(--r-chip) var(--r-chip) 2px 2px;background:color-mix(in oklch,var(--fg) 82%,var(--surface));min-height:3px}
+.bars .b.now i{background:var(--fg)}
+.bars .b span{font-family:var(--font-mono);font-size:10.5px;color:var(--fg-2);text-align:center;white-space:nowrap}
+.bars .b b{font-family:var(--font-mono);font-size:11px;font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
+
+/* ── table ─────────────────────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto}
+.tbl{font-size:14px;min-width:660px}
+.tbl th{font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--fg-2);text-align:left;padding:10px 16px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface)}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr{transition:background .12s ease}
+.tbl tbody tr:hover{background:var(--fg-soft)}
+.tbl .num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.tbl .act{text-align:right;white-space:nowrap}
+.tbl th.num,.tbl th.act{text-align:right}
+.cell-name{display:flex;align-items:center;gap:10px;min-width:0}
+.cell-name .nm{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell-name .em{font-size:12px;color:var(--fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rowbtn{border:0;background:transparent;padding:0;text-align:left;font:inherit;border-radius:var(--r-ctl);width:100%}
+.rowbtn:hover .nm{text-decoration:underline;text-underline-offset:3px}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px;border-top:1px solid var(--border);flex-wrap:wrap}
+.empty{padding:56px 24px;text-align:center;color:var(--fg-2)}
+.empty h3{font-size:18px;color:var(--fg);margin-bottom:6px}
+
+/* ── forms ─────────────────────────────────────────────────────────── */
+.fld{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fld>label{font-size:13px;font-weight:500;color:var(--fg-2)}
+.fld .req{color:var(--bad-ink)}
+.inp,select.inp,textarea.inp{width:100%;height:38px;padding:0 14px;border:1px solid var(--border);border-radius:var(--r-ctl);
+  background:var(--surface);color:var(--fg);font:inherit;font-size:14px;transition:border-color .15s ease,box-shadow .15s ease}
+textarea.inp{height:auto;min-height:76px;padding:10px 14px;line-height:1.5;resize:vertical}
+.inp::placeholder{color:var(--muted)}
+.inp:hover{border-color:var(--fg-2)}
+.inp:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-ring)}
+.inp[readonly]{background:var(--bg-alt);color:var(--fg-2);cursor:not-allowed}
+.inp[readonly]:hover{border-color:var(--border)}
+.fld[data-bad="1"] .inp{border-color:var(--bad)}
+.err{font-size:12.5px;color:var(--bad-ink);display:none}
+.fld[data-bad="1"] .err{display:block}
+.hint{font-size:12.5px;color:var(--fg-2)}
+select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49%,currentColor 50%),linear-gradient(-45deg,transparent 49%,currentColor 50%);
+  background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0}
+.sw{position:relative;width:20px;height:20px;flex:none}
+.sw input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.sw i{display:block;width:20px;height:20px;border-radius:var(--r-pill);background:var(--bg-alt);border:1px solid var(--border);transition:background .15s ease,border-color .15s ease}
+.sw i::after{content:"";position:absolute;left:6px;top:9px;width:8px;height:4px;border-left:1.6px solid var(--surface);border-bottom:1.6px solid var(--surface);transform:rotate(-45deg);opacity:0}
+.sw input:checked + i{background:var(--accent);border-color:var(--accent)}
+.sw input:checked + i::after{opacity:1}
+.sw input:focus-visible + i{box-shadow:0 0 0 3px var(--accent-ring)}
+
+/* ── dialog / drawer ───────────────────────────────────────────────── */
+.veil{position:fixed;inset:0;z-index:80;background:color-mix(in oklch,var(--fg) 34%,transparent);
+  display:flex;align-items:flex-start;justify-content:center;padding:56px 20px;overflow-y:auto}
+.dlg{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--sh-pop)}
+.dlg-wide{max-width:720px}
+.dlg-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid var(--border)}
+.dlg-bd{padding:24px}
+.dlg-ft{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border);flex-wrap:wrap}
+.xbtn{width:32px;height:32px;border:1px solid transparent;background:transparent;border-radius:var(--r-ctl);display:grid;place-items:center;color:var(--fg-2);flex:none}
+.xbtn:hover{background:var(--bg-alt);color:var(--fg);border-color:var(--border)}
+.xbtn svg{width:15px;height:15px}
+.drw{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:var(--surface);border-left:1px solid var(--border);
+  box-shadow:var(--sh-pop);z-index:80;display:flex;flex-direction:column}
+.drw-bd{overflow-y:auto;padding:24px;flex:1}
+.dl{display:grid;grid-template-columns:minmax(120px,38%) minmax(0,1fr);gap:2px 16px}
+.dl dt{font-size:13px;color:var(--fg-2);padding:9px 0;border-bottom:1px solid var(--border)}
+.dl dd{margin:0;font-size:14px;padding:9px 0;border-bottom:1px solid var(--border);min-width:0;overflow-wrap:break-word}
+.dl dt:last-of-type,.dl dd:last-of-type{border-bottom:0}
+
+/* ── toast ─────────────────────────────────────────────────────────── */
+.toasts{position:fixed;right:20px;bottom:20px;z-index:120;display:flex;flex-direction:column;gap:10px;width:min(380px,calc(100vw - 40px))}
+.toast{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-panel);box-shadow:var(--sh-pop);animation:pop .22s ease both}
+.toast svg{width:17px;height:17px;flex:none;margin-top:1px}
+.toast .tt{font-size:14px;font-weight:500}
+.toast .tc{font-family:var(--font-mono);font-size:11px;color:var(--fg-2);margin-top:2px;letter-spacing:0.02em}
+.toast.is-ok svg{color:var(--ok-ink)}
+.toast.is-bad svg{color:var(--bad-ink)}
+.toast.is-warn svg{color:var(--warn-ink)}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── command palette ───────────────────────────────────────────────── */
+.pal{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--sh-pop);overflow:hidden}
+.pal input{width:100%;height:52px;padding:0 20px;border:0;border-bottom:1px solid var(--border);font:inherit;font-size:15px;color:var(--fg);background:var(--surface)}
+.pal input:focus{outline:none}
+.pal-list{max-height:340px;overflow-y:auto;padding:8px}
+.pal-it{display:flex;align-items:center;gap:12px;width:100%;height:40px;padding:0 12px;border:0;background:transparent;border-radius:var(--r-ctl);font-size:14px;text-align:left}
+.pal-it:hover,.pal-it.cur{background:var(--bg-alt)}
+.pal-it .rl{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:var(--fg-2)}
+
+/* ── auth ──────────────────────────────────────────────────────────── */
+.auth{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.auth-art{position:relative;background:var(--fg);color:var(--surface);padding:48px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.dots{position:absolute;inset:0;opacity:.22;
+  background-image:radial-gradient(color-mix(in oklch,var(--surface) 60%,transparent) 1px,transparent 1px);
+  background-size:22px 22px}
+.auth-art>*{position:relative}
+.auth-art .t-display{font-size:clamp(34px,3.6vw,52px);max-width:17ch}
+.auth-art .dim{color:color-mix(in oklch,var(--surface) 68%,transparent)}
+.auth-art .brand-mk{background:var(--surface);color:var(--fg)}
+.auth-art .tenant{border-color:color-mix(in oklch,var(--surface) 30%,transparent);color:color-mix(in oklch,var(--surface) 74%,transparent)}
+.auth-pane{display:flex;align-items:center;justify-content:center;padding:48px 24px;background:var(--bg)}
+.auth-box{width:100%;max-width:400px}
+.seed{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1px solid var(--border);
+  border-radius:var(--r-panel);background:var(--surface);text-align:left;transition:border-color .15s ease,background .15s ease}
+.seed:hover{border-color:var(--accent);background:var(--accent-soft)}
+.seed .sn{font-size:13.5px;font-weight:500}
+.seed .sd{font-family:var(--font-mono);font-size:11px;color:var(--fg-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seed .chip{margin-left:auto}
+.spin{width:15px;height:15px;border-radius:var(--r-pill);border:2px solid color-mix(in oklch,var(--surface) 45%,transparent);
+  border-top-color:var(--surface);animation:sp .7s linear infinite}
+.spin.dark{border-color:var(--border);border-top-color:var(--fg)}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── plan / receipt bits ───────────────────────────────────────────── */
+.plan-tier{padding:20px;display:flex;flex-direction:column;gap:14px}
+.plan-tier.cur{border-color:var(--fg);box-shadow:0 0 0 3px color-mix(in oklch,var(--fg) 8%,transparent)}
+.price{font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:-0.035em;font-variant-numeric:tabular-nums}
+.price small{font-size:13px;font-weight:500;color:var(--fg-2);letter-spacing:-0.01em}
+.tick{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--fg-2)}
+.tick svg{width:15px;height:15px;flex:none;margin-top:3px;color:var(--ok-ink)}
+.tier-note{font-size:12.5px;color:var(--fg-2);border-top:1px solid var(--border);padding-top:12px;margin-top:2px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:12px;padding:12px 0}
+.step + .step{border-top:1px solid var(--border)}
+.step .sdot{width:20px;height:20px;border-radius:var(--r-pill);border:1px solid var(--border);flex:none;
+  display:grid;place-items:center;font-family:var(--font-mono);font-size:10px;color:var(--fg-2);background:var(--surface)}
+.step.done .sdot{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.step.live .sdot{background:var(--fg);border-color:var(--fg);color:var(--surface)}
+.step.wait{opacity:.5}
+.step .st{font-size:14px;font-weight:500}
+.step .sm{font-size:12.5px;color:var(--fg-2)}
+.rcpt{border:1px solid var(--border);border-radius:var(--r-panel);padding:20px;background:var(--bg-alt)}
+.rcpt-row{display:flex;justify-content:space-between;gap:16px;padding:7px 0;font-size:13.5px}
+.rcpt-row.tot{border-top:1px solid var(--border);margin-top:6px;padding-top:12px;font-weight:500;font-size:15px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto}
+.tab{height:40px;padding:0 14px;border:0;background:transparent;color:var(--fg-2);font-size:14px;font-weight:500;
+  border-bottom:2px solid transparent;border-radius:var(--r-ctl) var(--r-ctl) 0 0;white-space:nowrap}
+.tab:hover{color:var(--fg);background:var(--bg-alt)}
+.tab[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--fg)}
+.callout{border:1px solid var(--border);border-radius:var(--r-panel);padding:14px 16px;background:var(--bg-alt);font-size:13.5px;color:var(--fg-2)}
+.callout b{color:var(--fg);font-weight:500}
+
+/* ── responsive ────────────────────────────────────────────────────── */
+@media (max-width:1080px){
+  .g-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g-21,.g-12{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:980px){
+  .shell{grid-template-columns:minmax(0,1fr);gap:0}
+  .sidenav{position:fixed;top:var(--nav-h);left:0;bottom:0;width:270px;background:var(--surface);
+    border-right:1px solid var(--border);padding:20px 16px;overflow-y:auto;z-index:70;transform:translateX(-100%);
+    transition:transform .2s ease}
+  body.nav-open .sidenav{transform:none}
+  body.nav-open::after{content:"";position:fixed;inset:var(--nav-h) 0 0;background:color-mix(in oklch,var(--fg) 30%,transparent);z-index:60}
+  .hamb{display:grid}
+  .searchtrig{display:none}
+  .auth{grid-template-columns:minmax(0,1fr)}
+  .auth-art{display:none}
+}
+@media (max-width:760px){
+  .g-2,.g-3,.g-4{grid-template-columns:minmax(0,1fr)}
+  .wrap{padding-inline:16px}
+  .tenant{display:none}
+  .scrhead h1{font-size:26px}
+  .dl{grid-template-columns:minmax(0,1fr)}
+  .dl dt{padding-bottom:0;border-bottom:0}
+  .veil{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH ══════════════════════════════════════════════════════════ -->
+<div id="authView" data-od-id="auth">
+  <div class="auth">
+    <div class="auth-art" data-od-id="auth-art">
+      <div class="dots" aria-hidden="true"></div>
+      <div class="row g12">
+        <span class="brand-mk">IS</span>
+        <span style="font-family:var(--font-display);font-weight:700;letter-spacing:-0.03em">Iron Standard</span>
+        <span class="tenant">multi-tenant · phase 1</span>
+      </div>
+      <div class="col g20">
+        <p class="t-over" style="color:color-mix(in oklch,var(--surface) 62%,transparent)">Gym operations console</p>
+        <h2 class="t-display">One roster, one ledger, one seat count you can trust.</h2>
+        <p class="dim" style="max-width:46ch">Members, trainers, membership packages and GST invoicing for a single gym tenant. Roles and gym scope are resolved server-side — no gym id ever travels in a URL.</p>
+      </div>
+      <dl class="dl" style="max-width:400px">
+        <dt class="dim" style="border-color:color-mix(in oklch,var(--surface) 18%,transparent)">Auth</dt>
+        <dd class="mono" style="border-color:color-mix(in oklch,var(--surface) 18%,transparent);font-size:12.5px">Bearer access · 15 min · rotating refresh</dd>
+        <dt class="dim" style="border-color:color-mix(in oklch,var(--surface) 18%,transparent)">Surface</dt>
+        <dd class="mono" style="border-color:color-mix(in oklch,var(--surface) 18%,transparent);font-size:12.5px">/api/ · phase-1 routes only</dd>
+      </dl>
+    </div>
+
+    <div class="auth-pane">
+      <!-- login -->
+      <div class="auth-box" id="paneLogin">
+        <p class="t-over">Sign in</p>
+        <h1 class="t-h2" style="margin-top:10px">Welcome back.</h1>
+        <p class="dim t-sm" style="margin-top:8px">Email or phone, plus your password.</p>
+
+        <div class="banner is-bad" id="loginErr" hidden style="margin:20px 0 0">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7.5"/><path d="M10 6.5v4.5M10 13.6v.4"/></svg>
+          <div><p><strong>We couldn't sign you in.</strong></p><p class="b-sub">Check the email or phone and password and try again.</p></div>
+        </div>
+
+        <form class="col g16" id="loginForm" style="margin-top:24px" novalidate>
+          <div class="fld" id="fLoginId">
+            <label for="loginId">Email or phone</label>
+            <input class="inp" id="loginId" name="identifier" autocomplete="username" placeholder="you@gym.in or +91…" />
+            <span class="err">Enter the email or phone on your account.</span>
+          </div>
+          <div class="fld" id="fLoginPw">
+            <label for="loginPw">Password</label>
+            <input class="inp" id="loginPw" name="password" type="password" autocomplete="current-password" placeholder="••••••••" />
+            <span class="err">Enter your password.</span>
+          </div>
+          <div class="row-b">
+            <button type="button" class="btn btn-ghost btn-sm" data-go-pane="reset">Forgot password?</button>
+          </div>
+          <button class="btn btn-primary btn-lg btn-block" id="loginBtn" data-od-id="cta-signin">Sign in</button>
+        </form>
+
+        <hr class="sep" style="margin:28px 0 18px" />
+        <p class="t-over">Seeded identities · prototype data</p>
+        <div class="col g8" style="margin-top:12px" id="seedList"></div>
+        <p class="t-cap" style="margin-top:16px">New gym? <button class="linky" type="button" data-go-pane="register" style="border:0;background:none;padding:0;font:inherit">Register as an owner</button> — that call creates the tenant and returns both tokens.</p>
+      </div>
+
+      <!-- register owner -->
+      <div class="auth-box" id="paneRegister" hidden>
+        <p class="t-over">POST /api/auth/register/owner</p>
+        <h1 class="t-h2" style="margin-top:10px">Create your gym.</h1>
+        <p class="dim t-sm" style="margin-top:8px">This is the only route that creates an owner and a new tenant. Trainers and members are created from inside the console.</p>
+        <form class="col g16" id="regForm" style="margin-top:24px" novalidate>
+          <div class="grid g-2" style="gap:16px">
+            <div class="fld" id="fRegFirst"><label for="regFirst">First name</label><input class="inp" id="regFirst" placeholder="Aarav" /><span class="err">Required.</span></div>
+            <div class="fld" id="fRegLast"><label for="regLast">Last name</label><input class="inp" id="regLast" placeholder="Mehta" /><span class="err">Required.</span></div>
+          </div>
+          <div class="fld" id="fRegEmail"><label for="regEmail">Email <span class="req">*</span></label><input class="inp" id="regEmail" type="email" placeholder="owner@yourgym.in" /><span class="err">Enter a valid email address.</span></div>
+          <div class="fld" id="fRegBiz"><label for="regBiz">Registered business name <span class="req">*</span></label><input class="inp" id="regBiz" placeholder="Iron Standard Fitness LLP" /><span class="err">Required.</span></div>
+          <div class="grid g-2" style="gap:16px">
+            <div class="fld" id="fRegGym"><label for="regGym">Gym name</label><input class="inp" id="regGym" placeholder="Iron Standard · Andheri" /><span class="err">Required.</span></div>
+            <div class="fld" id="fRegPhone"><label for="regPhone">Contact phone <span class="req">*</span></label><input class="inp" id="regPhone" placeholder="+91 98200 41122" /><span class="err">Required.</span></div>
+          </div>
+          <div class="grid g-2" style="gap:16px">
+            <div class="fld" id="fRegTz"><label for="regTz">Timezone</label>
+              <select class="inp" id="regTz"><option>Asia/Kolkata</option><option>Asia/Dubai</option><option>Asia/Singapore</option></select></div>
+            <div class="fld" id="fRegGst"><label for="regGst">GSTIN <span class="dim">(optional)</span></label><input class="inp" id="regGst" placeholder="27AAFCI4321Q1ZP" />
+              <span class="hint">Left blank, invoices ship without CGST/SGST lines.</span></div>
+          </div>
+          <div class="grid g-2" style="gap:16px">
+            <div class="fld" id="fRegPw"><label for="regPw">Password <span class="req">*</span></label><input class="inp" id="regPw" type="password" placeholder="At least 8 characters" /><span class="err">Use at least 8 characters.</span></div>
+            <div class="fld" id="fRegPw2"><label for="regPw2">Confirm password <span class="req">*</span></label><input class="inp" id="regPw2" type="password" /><span class="err">Passwords don't match.</span></div>
+          </div>
+          <div class="row g12 wrapz" style="margin-top:4px">
+            <button class="btn btn-primary btn-lg" id="regBtn">Create gym &amp; sign in</button>
+            <button type="button" class="btn btn-ghost" data-go-pane="login">Back to sign in</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- password reset -->
+      <div class="auth-box" id="paneReset" hidden>
+        <p class="t-over">POST /api/auth/password-reset</p>
+        <h1 class="t-h2" style="margin-top:10px">Reset your password.</h1>
+        <p class="dim t-sm" style="margin-top:8px">We'll email a single-use link. The response is identical whether or not the address is registered.</p>
+        <form class="col g16" id="resetForm" style="margin-top:24px" novalidate>
+          <div class="fld" id="fResetEmail"><label for="resetEmail">Email</label><input class="inp" id="resetEmail" type="email" placeholder="you@gym.in" /><span class="err">Enter a valid email address.</span></div>
+          <button class="btn btn-primary btn-lg btn-block" id="resetBtn">Send reset link</button>
+          <button type="button" class="btn btn-ghost" data-go-pane="login">Back to sign in</button>
+        </form>
+        <div class="banner is-info" id="resetOk" hidden style="margin-top:20px">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2.5 5.5h15v9h-15z"/><path d="M2.5 5.5 10 11l7.5-5.5"/></svg>
+          <div><p><strong>Request accepted (202).</strong></p><p class="b-sub">If that address is on an account, a link is on its way. Valid once.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ═══════════════════════════════════════════════════════════ -->
+<div id="appView" hidden>
+  <header class="appbar" data-od-id="appbar">
+    <div class="wrap appbar-in">
+      <button class="hamb" id="hambBtn" aria-label="Open navigation" aria-expanded="false">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h14M3 10h14M3 14h14"/></svg>
+      </button>
+      <a class="brand" href="#/" data-od-id="brand"><span class="brand-mk">IS</span><span id="brandName">Iron Standard</span></a>
+      <span class="tenant" id="tenantChip">gym · —</span>
+      <button class="searchtrig push" id="palBtn" data-od-id="global-search">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="5.5"/><path d="m13.2 13.2 3.3 3.3"/></svg>
+        <span>Search members, invoices…</span><span class="kbd">⌘K</span>
+      </button>
+      <div style="position:relative" id="userWrap">
+        <button class="usrbtn" id="userBtn" aria-haspopup="menu" aria-expanded="false">
+          <span class="avatar" id="userAv">—</span>
+          <span class="col" style="gap:0;text-align:left">
+            <span style="font-size:13px;font-weight:500;line-height:1.3" id="userName">—</span>
+            <span class="t-cap" style="line-height:1.3" id="userRole">—</span>
+          </span>
+          <svg class="caret" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5.5 8 4.5 4.5L14.5 8"/></svg>
+        </button>
+        <div class="menu" id="userMenu" role="menu" hidden>
+          <div class="menu-hd">
+            <p style="font-size:14px;font-weight:500" id="menuName">—</p>
+            <p class="mono" style="font-size:11.5px;color:var(--fg-2)" id="menuMail">—</p>
+            <div class="row g8" style="margin-top:10px"><span class="chip" id="menuRoleChip">—</span><span class="chip" id="menuVerChip">—</span></div>
+          </div>
+          <hr class="sep" />
+          <div style="padding:6px 0 0">
+            <button class="menu-it" data-nav="account" role="menuitem">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="width:16px;height:16px"><circle cx="10" cy="7" r="3"/><path d="M4 16.5c0-2.8 2.7-4.5 6-4.5s6 1.7 6 4.5"/></svg>
+              My account</button>
+            <button class="menu-it is-bad" id="logoutBtn" role="menuitem">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="width:16px;height:16px"><path d="M12.5 6V4.5h-8v11h8V14"/><path d="M9 10h8m0 0-2.5-2.5M17 10l-2.5 2.5"/></svg>
+              Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap shell">
+    <aside class="sidenav" id="sidenav" data-od-id="sidenav"></aside>
+    <main class="main" id="main">
+      <div id="globalBanner"></div>
+      <!-- ── owner dashboard ─────────────────────────────────────── -->
+      <section class="scr" id="scr-dashboard" data-od-id="screen-owner-dashboard">
+        <div class="scrhead">
+          <div>
+            <h1 id="dashHi">Gym overview</h1>
+            <p class="sub dim t-sm">Seat count, collections and the roster your trainers are working from.</p>
+          </div>
+          <p class="ep"><b>GET</b> /api/me · /api/gym · /api/members · /api/invoices</p>
+        </div>
+        <div class="grid g-4" id="ownerKpis"></div>
+        <div class="grid g-21" style="margin-top:20px">
+          <div class="card">
+            <div class="card-head">
+              <div><h2 class="t-h4">Settled collections</h2><p class="t-cap">Summed from settled invoices in this tenant · ₹</p></div>
+              <span class="chip">last 6 months</span>
+            </div>
+            <div style="padding:20px 20px 18px"><div class="bars" id="collectBars"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2 class="t-h4">Seats &amp; plan</h2></div>
+            <div style="padding:20px" id="seatPanel"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-head">
+            <div><h2 class="t-h4">Joined recently</h2><p class="t-cap">Newest six member records by join date</p></div>
+            <button class="btn btn-ghost btn-sm" data-nav="members">Open members →</button>
+          </div>
+          <div class="tbl-wrap"><table class="tbl"><tbody id="recentMembers"></tbody></table></div>
+        </div>
+      </section>
+
+      <!-- ── members ─────────────────────────────────────────────── -->
+      <section class="scr" id="scr-members" data-od-id="screen-members">
+        <div class="scrhead">
+          <div>
+            <h1 id="membersTitle">Members</h1>
+            <p class="sub dim t-sm" id="membersSub">Every membership record in this gym, with derived status.</p>
+          </div>
+          <div class="row g12 wrapz">
+            <p class="ep"><b>GET</b>/<b>POST</b> /api/members</p>
+            <button class="btn btn-primary" id="addMemberBtn" data-od-id="cta-add-member">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 4.5v11M4.5 10h11"/></svg>Add member</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="row g8 wrapz" id="memberFilters"></div>
+            <div class="row g8">
+              <label class="fld" style="width:min(260px,52vw)"><span class="t-over" style="display:none">Search</span>
+                <input class="inp" id="memberSearch" type="search" placeholder="Name, email or phone" aria-label="Search members" /></label>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr>
+                <th>Member</th><th>Plan</th><th>Trainer</th><th>Joined</th>
+                <th>Status</th><th class="num">Period ends</th><th class="act">·</th>
+              </tr></thead>
+              <tbody id="memberRows"></tbody>
+            </table>
+          </div>
+          <div class="pager" id="memberPager"></div>
+        </div>
+      </section>
+
+      <!-- ── trainers ────────────────────────────────────────────── -->
+      <section class="scr" id="scr-trainers" data-od-id="screen-trainers">
+        <div class="scrhead">
+          <div><h1>Trainers</h1><p class="sub dim t-sm">Creating a trainer also creates their login. They set a password from the email link.</p></div>
+          <div class="row g12 wrapz">
+            <p class="ep"><b>GET</b>/<b>POST</b> /api/trainers</p>
+            <button class="btn btn-primary" id="addTrainerBtn" data-od-id="cta-add-trainer">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 4.5v11M4.5 10h11"/></svg>Add trainer</button>
+          </div>
+        </div>
+        <div class="grid g-3" id="trainerCards"></div>
+      </section>
+
+      <!-- ── membership plans ────────────────────────────────────── -->
+      <section class="scr" id="scr-plans" data-od-id="screen-membership-plans">
+        <div class="scrhead">
+          <div><h1>Membership plans</h1><p class="sub dim t-sm">The packages your members subscribe to. Duration drives the derived period end on every member.</p></div>
+          <div class="row g12 wrapz">
+            <p class="ep"><b>GET</b>/<b>POST</b>/<b>PATCH</b>/<b>DELETE</b> /api/membership-plans</p>
+            <button class="btn btn-primary" id="addPlanBtn" data-od-id="cta-add-plan">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 4.5v11M4.5 10h11"/></svg>New plan</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>Plan</th><th class="num">Price</th><th class="num">Duration</th><th>Includes</th><th class="num">On plan</th><th class="act">·</th></tr></thead>
+            <tbody id="planRows"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ── billing ─────────────────────────────────────────────── -->
+      <section class="scr" id="scr-billing" data-od-id="screen-billing">
+        <div class="scrhead">
+          <div><h1 id="billTitle">Billing</h1><p class="sub dim t-sm" id="billSub">GST invoices for this tenant, plus your platform subscription.</p></div>
+          <p class="ep"><b>GET</b> /api/invoices · <b>POST</b> /api/invoices/{id}/pay</p>
+        </div>
+        <div class="tabs" role="tablist" id="billTabs">
+          <button class="tab" role="tab" aria-selected="true" data-tab="invoices">Invoices</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="saas" id="tabSaas">Platform subscription</button>
+        </div>
+        <div id="billInvoices">
+          <div class="card">
+            <div class="card-head">
+              <div class="row g8 wrapz" id="invoiceFilters"></div>
+              <p class="t-cap mono" id="invoiceTotals">—</p>
+            </div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead><tr>
+                  <th>Invoice</th><th>Against</th><th class="num">Taxable</th><th class="num">CGST</th><th class="num">SGST</th>
+                  <th class="num">IGST</th><th class="num">Total</th><th>Status</th><th class="act">·</th>
+                </tr></thead>
+                <tbody id="invoiceRows"></tbody>
+              </table>
+            </div>
+            <div class="pager" id="invoicePager"></div>
+          </div>
+          <p class="t-cap" style="margin-top:12px">Tax columns render an em dash when the tenant has no GSTIN on file — the API returns <span class="mono">null</span>, not zero.</p>
+        </div>
+        <div id="billSaas" hidden>
+          <div id="saasCurrent"></div>
+          <p class="t-over" style="margin:28px 0 14px">Platform tiers · GET /api/saas-plans</p>
+          <div class="grid g-3" id="saasTiers"></div>
+          <p class="t-cap" style="margin-top:14px">Phase 1 exposes <span class="mono">GET /api/saas-plans</span> only — tier changes are not a client-side write, so this list is read-only. A downgrade below your current member count would return <span class="mono">PLAN_DOWNGRADE_BLOCKED</span> anyway.</p>
+        </div>
+      </section>
+
+      <!-- ── gym settings ────────────────────────────────────────── -->
+      <section class="scr" id="scr-settings" data-od-id="screen-gym-settings">
+        <div class="scrhead">
+          <div><h1>Gym settings</h1><p class="sub dim t-sm">Tenant record. The slug is assigned once at registration and never changes.</p></div>
+          <p class="ep"><b>GET</b>/<b>PATCH</b> /api/gym</p>
+        </div>
+        <div class="grid g-21">
+          <form class="card card-p col g20" id="gymForm" novalidate>
+            <div class="grid g-2" style="gap:20px">
+              <div class="fld" id="fGymName"><label for="gymName">Gym name <span class="req">*</span></label><input class="inp" id="gymName" /><span class="err">Required.</span></div>
+              <div class="fld"><label for="gymSlug">Slug</label><input class="inp" id="gymSlug" readonly />
+                <span class="hint">Read-only forever.</span></div>
+            </div>
+            <div class="grid g-2" style="gap:20px">
+              <div class="fld" id="fGymMail"><label for="gymMail">Contact email <span class="req">*</span></label><input class="inp" id="gymMail" type="email" /><span class="err">Enter a valid email address.</span></div>
+              <div class="fld" id="fGymPhone"><label for="gymPhone">Contact phone <span class="req">*</span></label><input class="inp" id="gymPhone" /><span class="err">Required.</span></div>
+            </div>
+            <div class="grid g-2" style="gap:20px">
+              <div class="fld"><label for="gymTz">Timezone</label>
+                <select class="inp" id="gymTz"><option>Asia/Kolkata</option><option>Asia/Dubai</option><option>Asia/Singapore</option></select></div>
+              <div class="fld" id="fGymGst"><label for="gymGst">GSTIN</label><input class="inp" id="gymGst" placeholder="Not registered" />
+                <span class="err">GSTIN must be 15 characters.</span>
+                <span class="hint">Clearing this drops CGST/SGST lines from future invoices.</span></div>
+            </div>
+            <hr class="sep" />
+            <div class="row-b wrapz">
+              <p class="t-cap" id="gymDirty">No unsaved changes.</p>
+              <div class="row g10"><button type="button" class="btn btn-secondary" id="gymReset">Discard</button>
+                <button class="btn btn-primary" id="gymSave">Save gym profile</button></div>
+            </div>
+          </form>
+          <div class="col g20">
+            <div class="card card-p col g12">
+              <p class="t-over">Tenancy</p>
+              <p class="t-sm dim">Gym scope is resolved from the caller's own profile on every request. No endpoint accepts a gym id, so there is nothing to tamper with client-side.</p>
+              <dl class="dl" id="tenancyFacts"></dl>
+            </div>
+            <div class="callout"><b>Not editable here.</b> Role and tenancy are fixed. Your own name and phone live under <button class="linky" type="button" data-nav="account" style="border:0;background:none;padding:0;font:inherit">My account</button>.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── trainer dashboard ───────────────────────────────────── -->
+      <section class="scr" id="scr-roster" data-od-id="screen-trainer-roster">
+        <div class="scrhead">
+          <div><h1 id="rosterTitle">My roster</h1>
+            <p class="sub dim t-sm">The API returns only the members assigned to you — this list is not filtered in the browser.</p></div>
+          <p class="ep"><b>GET</b> /api/members</p>
+        </div>
+        <div class="grid g-3" id="trainerKpis"></div>
+        <div class="card" style="margin-top:20px">
+          <div class="card-head">
+            <div class="row g8 wrapz" id="rosterFilters"></div>
+            <label class="fld" style="width:min(260px,52vw)">
+              <input class="inp" id="rosterSearch" type="search" placeholder="Search my members" aria-label="Search my members" /></label>
+          </div>
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>Member</th><th>Plan</th><th>Goal</th><th>Status</th><th class="num">Period ends</th><th class="act">·</th></tr></thead>
+            <tbody id="rosterRows"></tbody>
+          </table></div>
+          <div class="pager" id="rosterPager"></div>
+        </div>
+      </section>
+
+      <!-- ── member dashboard ────────────────────────────────────── -->
+      <section class="scr" id="scr-home" data-od-id="screen-member-home">
+        <div class="scrhead">
+          <div><h1 id="homeHi">Your membership</h1><p class="sub dim t-sm">Status and period end are computed by the backend from your paid invoices.</p></div>
+          <p class="ep"><b>GET</b> /api/me · /api/members/{member_profile_id}</p>
+        </div>
+        <div class="grid g-3" id="memberKpis"></div>
+        <div class="grid g-21" style="margin-top:20px">
+          <div class="card">
+            <div class="card-head"><div><h2 class="t-h4">Membership record</h2><p class="t-cap">Read-only. Status is derived, never toggled.</p></div></div>
+            <div style="padding:20px"><dl class="dl" id="memberRecord"></dl></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2 class="t-h4">Outstanding</h2></div>
+            <div style="padding:20px" id="memberDue"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── my invoices (member) ────────────────────────────────── -->
+      <section class="scr" id="scr-myinvoices" data-od-id="screen-my-invoices">
+        <div class="scrhead">
+          <div><h1>My invoices</h1><p class="sub dim t-sm">Only your own invoices are returned. Paying works even while your membership is inactive.</p></div>
+          <p class="ep"><b>GET</b> /api/invoices · <b>POST</b> /api/invoices/{id}/pay</p>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap"><table class="tbl">
+            <thead><tr><th>Invoice</th><th>Issued</th><th>Due</th><th class="num">Total</th><th>Status</th><th class="act">·</th></tr></thead>
+            <tbody id="myInvoiceRows"></tbody>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ── my account (all roles) ──────────────────────────────── -->
+      <section class="scr" id="scr-account" data-od-id="screen-account">
+        <div class="scrhead">
+          <div><h1>My account</h1><p class="sub dim t-sm">Name and phone only. Role and gym are set server-side.</p></div>
+          <p class="ep"><b>GET</b>/<b>PATCH</b> /api/me</p>
+        </div>
+        <div class="grid g-21">
+          <form class="card card-p col g20" id="meForm" novalidate>
+            <div class="row g16">
+              <span class="avatar avatar-lg" id="meAv">—</span>
+              <div><p class="t-h4" id="meName">—</p><p class="t-cap mono" id="meMail">—</p></div>
+            </div>
+            <hr class="sep" />
+            <div class="grid g-2" style="gap:20px">
+              <div class="fld" id="fMeFirst"><label for="meFirst">First name</label><input class="inp" id="meFirst" /><span class="err">Required.</span></div>
+              <div class="fld" id="fMeLast"><label for="meLast">Last name</label><input class="inp" id="meLast" /><span class="err">Required.</span></div>
+            </div>
+            <div class="grid g-2" style="gap:20px">
+              <div class="fld" id="fMePhone"><label for="mePhone">Phone</label><input class="inp" id="mePhone" /><span class="err">Enter a reachable number.</span></div>
+              <div class="fld"><label for="meRole">Role</label><input class="inp" id="meRole" readonly /><span class="hint">Assigned by the backend.</span></div>
+            </div>
+            <hr class="sep" />
+            <div class="row-b wrapz">
+              <p class="t-cap" id="meDirty">No unsaved changes.</p>
+              <div class="row g10"><button type="button" class="btn btn-secondary" id="meReset">Discard</button>
+                <button class="btn btn-primary" id="meSave">Save profile</button></div>
+            </div>
+          </form>
+          <div class="col g20">
+            <div class="card card-p col g12">
+              <p class="t-over">Session</p>
+              <dl class="dl" id="sessionFacts"></dl>
+              <p class="t-cap">A rotated refresh token replaces the previous one. Reusing a spent token returns <span class="mono">TOKEN_CONSUMED</span> and forces a sign-out.</p>
+            </div>
+            <div class="card card-p col g12" id="verifyCard"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="layers"></div>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   Iron Standard console — clickable prototype for the phase-1 API.
+   The network layer is a local stand-in that speaks the real contract:
+   Bearer tokens, rotating refresh, and { error: { code, message, details } }
+   on every non-2xx. UI branches on error.code, never on HTTP status alone.
+   All records below are seeded prototype data, not production figures.
+   ════════════════════════════════════════════════════════════════════ */
+const $  = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const DAY = 86400000;
+const TODAY = new Date(2026, 7, 30);
+const dnum = d => new Date(d).getTime();
+const fmtDate = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+const fmtShort = d => new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+const inr = n => '₹' + Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+const inr2 = n => '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const initials = (a, b) => ((a || '?')[0] + (b || '')[0] || '').toUpperCase();
+const dayDiff = (a, b) => Math.round((dnum(a) - dnum(b)) / DAY);
+const ICON = {
+  grid:'<path d="M3.5 3.5h5.5v5.5H3.5zM11 3.5h5.5v5.5H11zM3.5 11h5.5v5.5H3.5zM11 11h5.5v5.5H11z"/>',
+  users:'<circle cx="7.5" cy="7" r="2.8"/><path d="M2.5 16c0-2.5 2.2-4 5-4s5 1.5 5 4"/><path d="M13.5 5.6a2.6 2.6 0 0 1 0 5"/><path d="M14 12.4c2 .5 3.5 1.8 3.5 3.6"/>',
+  whistle:'<path d="M11.5 6.5h5.5l-1.5 4.5a5.5 5.5 0 1 1-4-4.5z"/><path d="M6.5 11.5h.01"/>',
+  card:'<rect x="2.5" y="4.5" width="15" height="11" rx="2"/><path d="M2.5 8.5h15"/>',
+  receipt:'<path d="M5 2.5h10v15l-2.5-1.6-2.5 1.6-2.5-1.6L5 17.5z"/><path d="M8 6.5h4M8 9.5h4"/>',
+  gear:'<circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4"/>',
+  user:'<circle cx="10" cy="7" r="3"/><path d="M4 16.5c0-2.8 2.7-4.5 6-4.5s6 1.7 6 4.5"/>',
+  check:'<path d="m4.5 10.5 3.5 3.5 7.5-8"/>',
+  alert:'<circle cx="10" cy="10" r="7.5"/><path d="M10 6.2v4.6M10 13.4v.4"/>',
+  info:'<circle cx="10" cy="10" r="7.5"/><path d="M10 9v4.6M10 6.4v.4"/>',
+  clock:'<circle cx="10" cy="10" r="7.5"/><path d="M10 6v4.3l2.8 1.7"/>',
+  x:'<path d="m5 5 10 10M15 5 5 15"/>',
+  lock:'<rect x="4.5" y="8.5" width="11" height="8" rx="2"/><path d="M7.2 8.5V6.6a2.8 2.8 0 0 1 5.6 0v1.9"/>'
+};
+const svg = (k, sz) => '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"' + (sz ? ' style="width:' + sz + 'px;height:' + sz + 'px"' : '') + '>' + ICON[k] + '</svg>';
+
+/* ── seeded tenant data ──────────────────────────────────────────── */
+const db = {
+  gym: { name: 'Iron Standard · Andheri West', slug: 'iron-standard-andheri-west',
+    contact_email: 'frontdesk@ironstandard.in', contact_phone: '+91 98200 41122',
+    timezone: 'Asia/Kolkata', gstin: '27AAFCI4321Q1ZP', is_active: true, created: new Date(2025, 6, 14) },
+  saas_plans: [
+    { id: 1, name: 'Starter', price: 1499, currency: 'INR', billing_interval_months: 1, max_members_allowed: 30 },
+    { id: 2, name: 'Growth', price: 11999, currency: 'INR', billing_interval_months: 6, max_members_allowed: 150 },
+    { id: 3, name: 'Chain', price: 21999, currency: 'INR', billing_interval_months: 12, max_members_allowed: 600 }
+  ],
+  saas_subscription: { plan_id: 1, status: 'active', current_period_end: new Date(2026, 8, 14) },
+  membership_plans: [
+    { id: 11, name: 'Monthly Floor Access', price: 1200, currency: 'INR', duration_days: 30, includes_trainer: false, includes_diet: false },
+    { id: 12, name: 'Quarterly + Coach', price: 4800, currency: 'INR', duration_days: 90, includes_trainer: true, includes_diet: false },
+    { id: 13, name: 'Annual Transform', price: 16500, currency: 'INR', duration_days: 365, includes_trainer: true, includes_diet: true }
+  ],
+  trainers: [
+    { id: 21, first_name: 'Rhea', last_name: 'Nair', email: 'rhea.nair@ironstandard.in', phone: '+91 98202 11845', specialization: 'Strength & conditioning', email_verified: true },
+    { id: 22, first_name: 'Vikram', last_name: 'Sethi', email: 'vikram.sethi@ironstandard.in', phone: '+91 98336 90214', specialization: 'Olympic lifting', email_verified: true },
+    { id: 23, first_name: 'Ananya', last_name: 'Bose', email: 'ananya.bose@ironstandard.in', phone: '+91 90045 77310', specialization: 'Mobility & rehab', email_verified: true },
+    { id: 24, first_name: 'Imran', last_name: 'Qureshi', email: 'imran.qureshi@ironstandard.in', phone: '+91 98693 20558', specialization: 'Endurance / HIIT', email_verified: false }
+  ],
+  members: [], invoices: [], payments: [], seq: { member: 100, trainer: 30, plan: 20, inv: 0, pay: 0 }
+};
+
+(function seedMembers() {
+  const raw = 'Aarav Mehta|Diya Kulkarni|Kabir Shah|Ishita Rao|Rohan Pillai|Ananya Iyer|Neel Bhatt|Saanvi Deshmukh|Arjun Menon|Meera Chauhan|Yash Gokhale|Tara Fernandes|Dev Sharma|Ira Banerjee|Kunal Joshi|Nisha Reddy|Aditya Patil|Sara Dsouza|Vivaan Malhotra|Aisha Khan|Siddharth Ghosh|Riya Kapoor|Manav Trivedi|Pooja Nambiar|Farhan Sheikh|Kavya Suresh|Omkar Jadhav|Zoya Merchant';
+  const goals = ['Fat loss · 8 kg', 'First unassisted pull-up', 'Powerlifting meet prep', 'Post-injury shoulder rehab', 'Half marathon in 2:05', 'General conditioning', 'Add 5 kg lean mass'];
+  raw.split('|').forEach((full, i) => {
+    const [first, last] = full.split(' ');
+    const plan = db.membership_plans[i % 3];
+    const trainer = plan.includes_trainer ? db.trainers[i % 4] : (i % 5 === 0 ? db.trainers[(i + 1) % 4] : null);
+    const lapsed = i % 7 === 2;
+    const endOff = lapsed ? -(3 + (i * 5) % 44) : (4 + (i * 11) % 88);
+    db.members.push({
+      id: ++db.seq.member, first_name: first, last_name: last,
+      email: (first + '.' + last).toLowerCase() + '@example.in',
+      phone: '+91 9' + String(80000000 + i * 137911).slice(0, 9),
+      plan: plan.id, trainer: trainer ? trainer.id : null,
+      join_date: new Date(dnum(TODAY) - (34 + (i * 23) % 420) * DAY),
+      goal: goals[i % goals.length], photo_url: null,
+      current_period_end: new Date(dnum(TODAY) + endOff * DAY)
+    });
+  });
+})();
+
+const memberIsActive = m => dnum(m.current_period_end) >= dnum(TODAY);
+const planOf = id => db.membership_plans.find(p => p.id === id) || null;
+const trainerOf = id => db.trainers.find(t => t.id === id) || null;
+const memberOf = id => db.members.find(m => m.id === id) || null;
+const saasPlanOf = id => db.saas_plans.find(p => p.id === id) || null;
+const fyOf = d => { const y = new Date(d).getFullYear(), m = new Date(d).getMonth(); return m >= 3 ? y + '-' + String(y + 1).slice(2) : (y - 1) + '-' + String(y).slice(2); };
+
+function makeInvoice(o) {
+  const gstApplies = o.gst !== false;
+  const taxable = o.taxable;
+  const cgst = gstApplies ? Math.round(taxable * 0.09 * 100) / 100 : null;
+  const sgst = gstApplies ? Math.round(taxable * 0.09 * 100) / 100 : null;
+  const total = Math.round((taxable + (cgst || 0) + (sgst || 0)) * 100) / 100;
+  const seqNo = ++db.seq.inv;
+  return {
+    id: 500 + seqNo, financial_year: fyOf(o.issue), sequence_no: seqNo,
+    number: 'IS/' + fyOf(o.issue) + '/' + String(seqNo).padStart(4, '0'),
+    taxable_value: taxable, cgst, sgst, igst: null,
+    hsn_sac: o.saas ? '998313' : '999723', total_amount: total, currency: 'INR',
+    status: o.status, issue_date: o.issue,
+    due_date: new Date(dnum(o.issue) + 7 * DAY),
+    membership: o.member || null, saas_subscription: o.saas ? db.saas_subscription.plan_id : null,
+    member_id: o.member || null, label: o.label
+  };
+}
+(function seedInvoices() {
+  const rows = [];
+  db.members.forEach((m, i) => {
+    if (i % 2 !== 0) return;
+    const p = planOf(m.plan);
+    const issue = new Date(dnum(m.current_period_end) - p.duration_days * DAY);
+    const overdue = dnum(m.current_period_end) < dnum(TODAY);
+    rows.push({ taxable: p.price, issue, status: overdue ? 'open' : (i % 8 === 6 ? 'open' : 'settled'),
+      member: m.id, label: p.name, gst: dnum(issue) > dnum(new Date(2025, 9, 1)) });
+  });
+  rows.push({ taxable: 4800, issue: new Date(2026, 4, 12), status: 'void', member: db.members[3].id, label: 'Quarterly + Coach · cancelled at desk' });
+  rows.push({ taxable: 1200, issue: new Date(2026, 5, 3), status: 'refunded', member: db.members[9].id, label: 'Monthly Floor Access · goodwill refund' });
+  for (let k = 5; k >= 0; k--) {
+    const issue = new Date(2026, 7 - k, 14);
+    rows.push({ taxable: 1499, issue, status: k === 0 ? 'open' : 'settled', saas: true, label: 'Starter · platform subscription' });
+  }
+  rows.sort((a, b) => dnum(a.issue) - dnum(b.issue)).forEach(r => db.invoices.push(makeInvoice(r)));
+  db.invoices.filter(v => v.status === 'settled').forEach(v => {
+    db.payments.push({ id: 900 + (++db.seq.pay), invoice: v.id, status: 'succeeded',
+      amount: v.total_amount, method: 'upi', paid_at: new Date(dnum(v.issue_date) + 2 * DAY), order_ref: 'order_' + v.number.replace(/\W/g, '') });
+  });
+})();
+const paymentFor = invId => db.payments.find(p => p.invoice === invId) || null;
+const invoiceOf = id => db.invoices.find(v => v.id === id) || null;
+const openSaasInvoice = () => db.invoices.filter(v => v.saas_subscription && v.status === 'open').sort((a, b) => dnum(a.due_date) - dnum(b.due_date))[0] || null;
+
+/* ── seeded identities ──────────────────────────────────────────── */
+const IDENTITIES = [
+  { key: 'owner', identifier: 'aarav.owner@ironstandard.in', password: 'ironstandard', label: 'Aarav Kothari', tag: 'Owner',
+    tone: '', user: { id: 1, first_name: 'Aarav', last_name: 'Kothari', email: 'aarav.owner@ironstandard.in', phone: '+91 98200 41122', role: 'owner', email_verified: true, subscription_status: 'active' } },
+  { key: 'owner-lapsed', identifier: 'nikhil.owner@ironstandard.in', password: 'ironstandard', label: 'Nikhil Kothari', tag: 'Owner · past due',
+    tone: 'chip-bad', user: { id: 2, first_name: 'Nikhil', last_name: 'Kothari', email: 'nikhil.owner@ironstandard.in', phone: '+91 98200 41123', role: 'owner', email_verified: true, subscription_status: 'past_due' } },
+  { key: 'trainer', identifier: 'rhea.nair@ironstandard.in', password: 'ironstandard', label: 'Rhea Nair', tag: 'Trainer',
+    tone: '', user: { id: 21, first_name: 'Rhea', last_name: 'Nair', email: 'rhea.nair@ironstandard.in', phone: '+91 98202 11845', role: 'trainer', email_verified: true, trainer_id: 21, subscription_status: 'active' } },
+  { key: 'member', identifier: 'kabir.shah@example.in', password: 'ironstandard', label: 'Kabir Shah', tag: 'Member · expired',
+    tone: 'chip-warn', user: { id: 103, first_name: 'Kabir', last_name: 'Shah', email: 'kabir.shah@example.in', phone: '', role: 'member', email_verified: false, member_profile_id: 103, subscription_status: 'active' } }
+];
+
+/* ── session + mock transport ───────────────────────────────────── */
+const SKEY = 'ironstandard.session.v1', RKEY = 'ironstandard.route.v1';
+let session = null;   // { access, refresh, identity, me }
+class ApiError extends Error {
+  constructor(status, code, message, details) { super(message); this.status = status; this.code = code; this.details = details || null; }
+}
+const fail = (status, code, message, details) => { throw new ApiError(status, code, message, details); };
+const newToken = kind => kind + '_' + Math.random().toString(36).slice(2, 10) + '.' + Date.now().toString(36);
+
+function buildMe(identity) {
+  const u = identity.user, mp = u.member_profile_id ? memberOf(u.member_profile_id) : null;
+  return {
+    id: u.id, email: u.email, first_name: u.first_name, last_name: u.last_name, phone: u.phone,
+    role: u.role, email_verified: u.email_verified, gym: db.gym.name,
+    subscription_status: u.role === 'owner' ? u.subscription_status : db.saas_subscription.status,
+    is_active_member: mp ? memberIsActive(mp) : null,
+    current_period_end: mp ? mp.current_period_end : (u.role === 'owner' ? db.saas_subscription.current_period_end : null),
+    member_profile_id: u.member_profile_id || null, trainer_id: u.trainer_id || null
+  };
+}
+const writesBlocked = () => !!session && session.me.role === 'owner' && !['active', 'trialing'].includes(session.me.subscription_status);
+
+/* Every mutation routes through here so the 402 gate matches the backend. */
+async function request(method, path, body) {
+  await sleep(160 + Math.random() * 200);
+  const write = method !== 'GET';
+  const isPublicAuth = /^\/api\/auth\//.test(path);
+  if (write && !isPublicAuth && !session) fail(401, 'NOT_AUTHENTICATED', 'Authentication credentials were not provided.');
+  const payAttempt = /^\/api\/invoices\/\d+\/pay$/.test(path);
+  if (write && !isPublicAuth && writesBlocked() && !payAttempt) {
+    fail(402, 'SUBSCRIPTION_REQUIRED', 'This gym\'s subscription is past due. Settle the platform invoice to restore writes.',
+      { invoice: openSaasInvoice() ? openSaasInvoice().number : null });
+  }
+  const rcpt = path.match(/^\/api\/payments\/(\d+)\/receipt$/);
+  if (rcpt) {
+    const p = db.payments.find(x => x.id === +rcpt[1]);
+    if (!p) fail(404, 'NOT_FOUND', 'No payment matches that id.');
+    if (p.status !== 'succeeded') fail(409, 'CONFLICT', 'The receipt is only issued once the payment has succeeded.', { payment_status: p.status });
+    return { ok: true, url: '/receipts/' + p.order_ref + '.pdf' };
+  }
+  if (path === '/api/members' && method === 'POST') {
+    const cap = saasPlanOf(db.saas_subscription.plan_id).max_members_allowed;
+    if (db.members.length >= cap) fail(409, 'SEAT_LIMIT_REACHED', 'This gym has used every member seat on its current plan.',
+      { seats_used: db.members.length, max_members_allowed: cap, plan: saasPlanOf(db.saas_subscription.plan_id).name });
+    if (db.members.some(m => m.email.toLowerCase() === String(body.email).toLowerCase()))
+      fail(400, 'VALIDATION_ERROR', 'A member with this email already exists in this gym.', { email: 'Already in use.' });
+  }
+  if (path === '/api/trainers' && method === 'POST' && db.trainers.some(t => t.email.toLowerCase() === String(body.email).toLowerCase()))
+    fail(400, 'VALIDATION_ERROR', 'A trainer with this email already exists.', { email: 'Already in use.' });
+  if (path === '/api/auth/login') {
+    const hit = IDENTITIES.find(i => i.identifier.toLowerCase() === String(body.identifier || '').trim().toLowerCase() && i.password === body.password);
+    if (!hit) fail(401, 'INVALID_CREDENTIALS', 'No active account matches those credentials.');
+    return { access: newToken('acc'), refresh: newToken('ref'), identity: hit.key };
+  }
+  return { ok: true };
+}
+
+function signIn(identity) {
+  session = { access: newToken('acc'), refresh: newToken('ref'), identity: identity.key, me: buildMe(identity),
+    issued: Date.now(), refreshes: 0 };
+  localStorage.setItem(SKEY, JSON.stringify({ identity: identity.key }));
+  enterApp();
+}
+function rotate() { if (!session) return; session.refresh = newToken('ref'); session.access = newToken('acc'); session.refreshes++; }
+async function signOut() {
+  try { await request('POST', '/api/auth/logout', { refresh: session.refresh }); } catch (e) { /* blacklisted either way */ }
+  session = null; localStorage.removeItem(SKEY); localStorage.removeItem(RKEY);
+  closeLayers(); $('#appView').hidden = true; $('#authView').hidden = false; showPane('login');
+  document.body.classList.remove('nav-open'); window.scrollTo({ top: 0 });
+}
+
+/* ── toasts + one error layer keyed on error.code ────────────────── */
+function toast(kind, title, code, note) {
+  const n = document.createElement('div');
+  n.className = 'toast is-' + kind;
+  n.innerHTML = svg(kind === 'ok' ? 'check' : kind === 'bad' ? 'alert' : 'info', 17) +
+    '<div style="min-width:0"><p class="tt">' + esc(title) + '</p>' +
+    (note ? '<p class="t-cap" style="margin-top:2px">' + esc(note) + '</p>' : '') +
+    (code ? '<p class="tc">error.code · ' + esc(code) + '</p>' : '') + '</div>' +
+    '<button class="xbtn push" aria-label="Dismiss">' + svg('x', 13) + '</button>';
+  $('.xbtn', n).onclick = () => n.remove();
+  $('#toasts').appendChild(n);
+  setTimeout(() => n.remove(), 7000);
+}
+const ERR_COPY = {
+  TOKEN_EXPIRED: 'Session refreshed — retrying that request.',
+  TOKEN_CONSUMED: 'That refresh token was already spent. Sign in again.',
+  NOT_AUTHENTICATED: 'Sign in to continue.',
+  FORBIDDEN: 'Your role cannot perform that action.',
+  NOT_FOUND: 'That record is not available.',
+  RATE_LIMITED: 'Too many attempts. Wait a moment and retry.',
+  CONFLICT: 'That record changed while you were editing it.',
+  SERVER_ERROR: 'The server failed on that request.'
+};
+function handleError(err, opts) {
+  opts = opts || {};
+  if (!(err instanceof ApiError)) { toast('bad', 'Something broke in the browser.', 'CLIENT_ERROR'); return; }
+  if (err.code === 'SUBSCRIPTION_REQUIRED') {
+    toast('bad', 'Writes are locked until the platform invoice is settled.', err.code, err.details && err.details.invoice ? 'Outstanding: ' + err.details.invoice : '');
+    closeLayers(); renderBanner(); if (session && session.me.role === 'owner') go('billing');
+    return;
+  }
+  if (err.code === 'SEAT_LIMIT_REACHED' && opts.onSeatLimit) { opts.onSeatLimit(err); return; }
+  if (err.code === 'VALIDATION_ERROR' && opts.onValidation) { opts.onValidation(err); return; }
+  toast('bad', ERR_COPY[err.code] || err.message, err.code);
+}
+
+/* ── layers: dialogs + drawers ──────────────────────────────────── */
+function closeLayers() { $('#layers').innerHTML = ''; document.removeEventListener('keydown', escLayer); }
+function escLayer(e) { if (e.key === 'Escape') closeLayers(); }
+function openLayer(html, onMount) {
+  const host = $('#layers');
+  host.innerHTML = html;
+  document.addEventListener('keydown', escLayer);
+  $$('[data-close]', host).forEach(b => b.onclick = closeLayers);
+  const veil = $('.veil', host);
+  if (veil) veil.addEventListener('mousedown', e => { if (e.target === veil) closeLayers(); });
+  const first = $('input:not([readonly]),select,textarea,button.btn-primary', host);
+  if (first) first.focus();
+  if (onMount) onMount(host);
+}
+const dlgHead = (over, title, sub) =>
+  '<div class="dlg-hd"><div><p class="t-over">' + esc(over) + '</p><h2 class="t-h3" style="margin-top:6px">' + esc(title) + '</h2>' +
+  (sub ? '<p class="t-cap" style="margin-top:6px;max-width:52ch">' + esc(sub) + '</p>' : '') +
+  '</div><button class="xbtn" data-close aria-label="Close">' + svg('x', 15) + '</button></div>';
+
+/* ── validation helper ──────────────────────────────────────────── */
+function validate(rules) {
+  let ok = true, firstBad = null;
+  rules.forEach(r => {
+    const fld = $('#' + r.f), input = $('#' + r.i);
+    const bad = !r.test(input.value.trim(), input);
+    fld.dataset.bad = bad ? '1' : '';
+    if (r.msg && bad) $('.err', fld).textContent = r.msg;
+    if (bad && !firstBad) firstBad = input;
+    if (bad) ok = false;
+  });
+  if (firstBad) firstBad.focus();
+  return ok;
+}
+const isMail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+const notEmpty = v => v.length > 0;
+async function withBusy(btn, label, fn) {
+  const old = btn.innerHTML; btn.disabled = true;
+  btn.innerHTML = '<span class="spin' + (btn.classList.contains('btn-primary') ? '' : ' dark') + '"></span>' + esc(label);
+  try { return await fn(); } finally { btn.disabled = false; btn.innerHTML = old; }
+}
+
+/* ── auth panes ─────────────────────────────────────────────────── */
+function showPane(which) {
+  ['login', 'register', 'reset'].forEach(p => $('#pane' + p[0].toUpperCase() + p.slice(1)).hidden = p !== which);
+  $('#loginErr').hidden = true; $('#resetOk').hidden = true;
+}
+$$('[data-go-pane]').forEach(b => b.onclick = () => showPane(b.dataset.goPane));
+$('#seedList').innerHTML = IDENTITIES.map((i, n) =>
+  '<button class="seed" type="button" data-seed="' + n + '"><span class="avatar">' + esc(initials(i.user.first_name, i.user.last_name)) + '</span>' +
+  '<span class="col" style="min-width:0"><span class="sn">' + esc(i.label) + '</span><span class="sd">' + esc(i.identifier) + '</span></span>' +
+  '<span class="chip ' + i.tone + '">' + esc(i.tag) + '</span></button>').join('');
+$$('[data-seed]').forEach(b => b.onclick = () => {
+  const i = IDENTITIES[+b.dataset.seed];
+  $('#loginId').value = i.identifier; $('#loginPw').value = i.password;
+  $('#loginErr').hidden = true; $('#fLoginId').dataset.bad = ''; $('#fLoginPw').dataset.bad = '';
+  $('#loginBtn').focus();
+});
+$('#loginForm').onsubmit = async e => {
+  e.preventDefault(); $('#loginErr').hidden = true;
+  if (!validate([{ f: 'fLoginId', i: 'loginId', test: notEmpty }, { f: 'fLoginPw', i: 'loginPw', test: notEmpty }])) return;
+  await withBusy($('#loginBtn'), 'Signing in…', async () => {
+    try {
+      const r = await request('POST', '/api/auth/login', { identifier: $('#loginId').value, password: $('#loginPw').value });
+      signIn(IDENTITIES.find(i => i.key === r.identity));
+    } catch (err) {
+      if (err.code === 'INVALID_CREDENTIALS') { $('#loginErr').hidden = false; return; }
+      handleError(err);
+    }
+  });
+};
+$('#regForm').onsubmit = async e => {
+  e.preventDefault();
+  const ok = validate([
+    { f: 'fRegFirst', i: 'regFirst', test: notEmpty }, { f: 'fRegLast', i: 'regLast', test: notEmpty },
+    { f: 'fRegEmail', i: 'regEmail', test: isMail }, { f: 'fRegBiz', i: 'regBiz', test: notEmpty },
+    { f: 'fRegGym', i: 'regGym', test: notEmpty }, { f: 'fRegPhone', i: 'regPhone', test: notEmpty },
+    { f: 'fRegPw', i: 'regPw', test: v => v.length >= 8 },
+    { f: 'fRegPw2', i: 'regPw2', test: v => v.length >= 8 && v === $('#regPw').value }
+  ]);
+  if (!ok) return;
+  await withBusy($('#regBtn'), 'Creating…', async () => {
+    await sleep(420);
+    toast('ok', 'Tenant created. Verify your email to unlock invoicing.', null, 'Signed in as the owner of a brand-new gym.');
+    const proto = IDENTITIES[0];
+    proto.user.first_name = $('#regFirst').value.trim(); proto.user.last_name = $('#regLast').value.trim();
+    proto.user.email = $('#regEmail').value.trim(); proto.user.email_verified = false;
+    db.gym.name = $('#regGym').value.trim(); db.gym.contact_phone = $('#regPhone').value.trim();
+    db.gym.gstin = $('#regGst').value.trim() || null; db.gym.timezone = $('#regTz').value;
+    signIn(proto);
+  });
+};
+$('#resetForm').onsubmit = async e => {
+  e.preventDefault();
+  if (!validate([{ f: 'fResetEmail', i: 'resetEmail', test: isMail }])) return;
+  await withBusy($('#resetBtn'), 'Sending…', async () => { await sleep(380); $('#resetOk').hidden = false; });
+};
+
+/* ── nav model + router ─────────────────────────────────────────── */
+const ROUTES = {
+  dashboard:  { label: 'Dashboard',        icon: 'grid',    roles: ['owner'],  grp: 'Operations' },
+  members:    { label: 'Members',          icon: 'users',   roles: ['owner'],  grp: 'Operations', count: () => db.members.length },
+  trainers:   { label: 'Trainers',         icon: 'whistle', roles: ['owner'],  grp: 'Operations', count: () => db.trainers.length },
+  plans:      { label: 'Membership plans', icon: 'card',    roles: ['owner'],  grp: 'Operations', count: () => db.membership_plans.length },
+  billing:    { label: 'Billing',          icon: 'receipt', roles: ['owner'],  grp: 'Business' },
+  settings:   { label: 'Gym settings',     icon: 'gear',    roles: ['owner'],  grp: 'Business' },
+  roster:     { label: 'My roster',        icon: 'users',   roles: ['trainer'], grp: 'Coaching' },
+  home:       { label: 'Overview',         icon: 'grid',    roles: ['member'], grp: 'Membership' },
+  myinvoices: { label: 'My invoices',      icon: 'receipt', roles: ['member'], grp: 'Membership', count: () => myInvoices().length },
+  account:    { label: 'My account',       icon: 'user',    roles: ['trainer', 'member'], grp: 'Account' }
+};
+const HOME_FOR = { owner: 'dashboard', trainer: 'roster', member: 'home' };
+let route = 'dashboard';
+
+function go(id) {
+  if (!session) return;
+  const r = ROUTES[id];
+  const allowed = r && (r.roles.includes(session.me.role) || id === 'account');
+  route = allowed ? id : HOME_FOR[session.me.role];
+  localStorage.setItem(RKEY, route);
+  $$('.scr').forEach(s => s.classList.toggle('on', s.id === 'scr-' + route));
+  $$('.navit').forEach(b => b.setAttribute('aria-current', b.dataset.nav === route ? 'page' : 'false'));
+  document.body.classList.remove('nav-open'); $('#hambBtn').setAttribute('aria-expanded', 'false');
+  $('#userMenu').hidden = true; $('#userBtn').setAttribute('aria-expanded', 'false');
+  (SCREENS[route] || function () {})();
+  window.scrollTo({ top: 0, behavior: 'instant' in window ? 'auto' : 'auto' });
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-nav]');
+  if (t) { e.preventDefault(); go(t.dataset.nav); }
+});
+
+function renderNav() {
+  const role = session.me.role;
+  const ids = Object.keys(ROUTES).filter(k => ROUTES[k].roles.includes(role));
+  const groups = [];
+  ids.forEach(id => {
+    const g = ROUTES[id].grp;
+    let bucket = groups.find(x => x.g === g);
+    if (!bucket) groups.push(bucket = { g, items: [] });
+    bucket.items.push(id);
+  });
+  let html = groups.map(b => '<div class="navgrp"><p class="t-over">' + esc(b.g) + '</p>' + b.items.map(id => {
+    const r = ROUTES[id], c = r.count ? r.count() : null;
+    return '<button class="navit" data-nav="' + id + '" aria-current="false">' + svg(r.icon, 16) +
+      '<span>' + esc(r.label) + '</span>' + (c != null ? '<span class="cnt">' + c + '</span>' : '') + '</button>';
+  }).join('') + '</div>').join('');
+  if (role === 'owner') {
+    const cap = saasPlanOf(db.saas_subscription.plan_id).max_members_allowed, used = db.members.length;
+    const pct = Math.min(100, Math.round(used / cap * 100));
+    const tone = pct >= 100 ? 'is-bad' : pct >= 85 ? 'is-warn' : '';
+    html += '<div class="seatbox"><div class="row-b"><span class="t-over">Member seats</span>' +
+      '<span class="mono t-cap">' + used + ' / ' + cap + '</span></div>' +
+      '<div class="meter ' + tone + '"><i style="width:' + pct + '%"></i></div>' +
+      '<p class="t-cap" style="margin-top:8px">' + (cap - used <= 0 ? 'No seats left on ' : (cap - used) + ' seat' + (cap - used === 1 ? '' : 's') + ' left on ') +
+      esc(saasPlanOf(db.saas_subscription.plan_id).name) + '.</p>' +
+      '<button class="btn btn-secondary btn-sm btn-block" style="margin-top:10px" data-nav="billing">Review plan</button></div>';
+  }
+  $('#sidenav').innerHTML = html;
+}
+
+function renderBanner() {
+  const me = session.me, host = $('#globalBanner');
+  let html = '';
+  if (me.role === 'owner' && !['active', 'trialing'].includes(me.subscription_status)) {
+    const inv = openSaasInvoice();
+    html = '<div class="banner is-bad" data-od-id="banner-subscription-required">' + svg('lock', 18) +
+      '<div style="min-width:0"><p><strong>Read-only: your platform subscription is ' + esc(me.subscription_status.replace('_', ' ')) + '.</strong></p>' +
+      '<p class="b-sub">Every write returns 402 SUBSCRIPTION_REQUIRED until ' + (inv ? esc(inv.number) + ' (' + inr(inv.total_amount) + ')' : 'the outstanding invoice') + ' is settled. Paying stays open.</p></div>' +
+      '<button class="btn btn-secondary btn-sm push" data-nav="billing">Open billing</button></div>';
+  } else if (me.role === 'owner' && me.subscription_status === 'trialing') {
+    html = '<div class="banner is-info">' + svg('clock', 18) + '<div><p><strong>Trial ends ' + fmtDate(me.current_period_end) + '.</strong></p>' +
+      '<p class="b-sub">Settle the platform invoice before then to keep writes open.</p></div></div>';
+  } else if (me.role === 'member' && me.is_active_member === false) {
+    const due = myInvoices().filter(v => v.status === 'open')[0];
+    html = '<div class="banner is-warn" data-od-id="banner-membership-lapsed">' + svg('alert', 18) +
+      '<div style="min-width:0"><p><strong>Your membership lapsed on ' + fmtDate(me.current_period_end) + '.</strong></p>' +
+      '<p class="b-sub">' + (due ? esc(due.number) + ' for ' + inr(due.total_amount) + ' is outstanding. Paying it restores access immediately.' : 'Ask the front desk to raise a renewal invoice.') + '</p></div>' +
+      (due ? '<button class="btn btn-secondary btn-sm push" data-nav="myinvoices">Open invoices</button>' : '') + '</div>';
+  }
+  host.innerHTML = html;
+}
+
+function enterApp() {
+  $('#authView').hidden = true; $('#appView').hidden = false;
+  const me = session.me;
+  $('#brandName').textContent = db.gym.name.split(' · ')[0];
+  $('#tenantChip').textContent = 'gym · ' + db.gym.slug;
+  $('#userAv').textContent = initials(me.first_name, me.last_name);
+  $('#userName').textContent = me.first_name + ' ' + me.last_name;
+  $('#userRole').textContent = me.role[0].toUpperCase() + me.role.slice(1);
+  $('#menuName').textContent = me.first_name + ' ' + me.last_name;
+  $('#menuMail').textContent = me.email;
+  $('#menuRoleChip').textContent = me.role;
+  const v = $('#menuVerChip');
+  v.textContent = me.email_verified ? 'email verified' : 'email unverified';
+  v.className = 'chip ' + (me.email_verified ? 'chip-ok' : 'chip-warn');
+  renderNav(); renderBanner();
+  const saved = localStorage.getItem(RKEY);
+  go(saved && ROUTES[saved] && (ROUTES[saved].roles.includes(me.role) || saved === 'account') ? saved : HOME_FOR[me.role]);
+}
+
+/* ── appbar behaviour ───────────────────────────────────────────── */
+$('#userBtn').onclick = e => {
+  e.stopPropagation();
+  const m = $('#userMenu'), open = m.hidden;
+  m.hidden = !open; $('#userBtn').setAttribute('aria-expanded', String(open));
+};
+document.addEventListener('click', e => { if (!e.target.closest('#userWrap')) { $('#userMenu').hidden = true; $('#userBtn').setAttribute('aria-expanded', 'false'); } });
+$('#logoutBtn').onclick = () => signOut();
+$('#hambBtn').onclick = () => {
+  const on = document.body.classList.toggle('nav-open');
+  $('#hambBtn').setAttribute('aria-expanded', String(on));
+};
+
+/* ── command palette ────────────────────────────────────────────── */
+function openPalette() {
+  if (!session) return;
+  openLayer('<div class="veil"><div class="pal" role="dialog" aria-label="Search and jump">' +
+    '<input id="palIn" placeholder="Jump to a screen, member or invoice…" aria-label="Search" autocomplete="off" />' +
+    '<div class="pal-list" id="palList"></div></div></div>', () => {
+    const inp = $('#palIn'); let cur = 0, items = [];
+    const build = q => {
+      q = q.trim().toLowerCase();
+      const out = [];
+      Object.keys(ROUTES).filter(k => ROUTES[k].roles.includes(session.me.role) || k === 'account')
+        .forEach(k => { if (!q || ROUTES[k].label.toLowerCase().includes(q)) out.push({ t: ROUTES[k].label, r: 'Screen', go: () => go(k) }); });
+      if (q && session.me.role !== 'member') {
+        visibleMembers().filter(m => (m.first_name + ' ' + m.last_name + ' ' + m.email).toLowerCase().includes(q))
+          .slice(0, 6).forEach(m => out.push({ t: m.first_name + ' ' + m.last_name, r: 'Member', go: () => { go(session.me.role === 'owner' ? 'members' : 'roster'); openMemberDrawer(m.id); } }));
+      }
+      if (q) visibleInvoices().filter(v => v.number.toLowerCase().includes(q)).slice(0, 5)
+        .forEach(v => out.push({ t: v.number, r: 'Invoice', go: () => { go(session.me.role === 'member' ? 'myinvoices' : 'billing'); openInvoiceDrawer(v.id); } }));
+      items = out.slice(0, 12); cur = 0; paint();
+    };
+    const paint = () => {
+      $('#palList').innerHTML = items.length
+        ? items.map((it, i) => '<button class="pal-it' + (i === cur ? ' cur' : '') + '" data-i="' + i + '">' + esc(it.t) + '<span class="rl">' + esc(it.r) + '</span></button>').join('')
+        : '<p class="t-cap" style="padding:14px 12px">Nothing matches that.</p>';
+      $$('#palList .pal-it').forEach(b => b.onclick = () => { closeLayers(); items[+b.dataset.i].go(); });
+    };
+    inp.oninput = () => build(inp.value);
+    inp.onkeydown = e => {
+      if (e.key === 'ArrowDown') { cur = Math.min(items.length - 1, cur + 1); paint(); e.preventDefault(); }
+      if (e.key === 'ArrowUp') { cur = Math.max(0, cur - 1); paint(); e.preventDefault(); }
+      if (e.key === 'Enter' && items[cur]) { closeLayers(); items[cur].go(); }
+    };
+    build('');
+  });
+}
+$('#palBtn').onclick = openPalette;
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openPalette(); }
+});
+
+/* ── scoping: what the signed-in role is allowed to read ────────── */
+function visibleMembers() {
+  if (!session) return [];
+  if (session.me.role === 'owner') return db.members;
+  if (session.me.role === 'trainer') return db.members.filter(m => m.trainer === session.me.trainer_id);
+  return db.members.filter(m => m.id === session.me.member_profile_id);
+}
+function visibleInvoices() {
+  if (!session) return [];
+  if (session.me.role === 'owner') return db.invoices;
+  if (session.me.role === 'member') return myInvoices();
+  return [];
+}
+function myInvoices() {
+  if (!session || !session.me.member_profile_id) return [];
+  return db.invoices.filter(v => v.membership === session.me.member_profile_id)
+    .sort((a, b) => dnum(b.issue_date) - dnum(a.issue_date));
+}
+
+/* ── small presentational helpers ───────────────────────────────── */
+const PAGE = 10;
+const memberStatusChip = m => memberIsActive(m)
+  ? '<span class="chip chip-ok chip-dot">active</span>'
+  : '<span class="chip chip-warn chip-dot">lapsed</span>';
+function invStatusChip(v) {
+  if (v.status === 'settled') return '<span class="chip chip-ok chip-dot">settled</span>';
+  if (v.status === 'void') return '<span class="chip chip-dot">void</span>';
+  if (v.status === 'refunded') return '<span class="chip chip-warn chip-dot">refunded</span>';
+  const late = dnum(v.due_date) < dnum(TODAY);
+  return '<span class="chip ' + (late ? 'chip-bad' : 'chip-warn') + ' chip-dot">' + (late ? 'overdue' : 'open') + '</span>';
+}
+/* Tax columns are null — not zero — when GST did not apply to that invoice. */
+const taxCell = n => n == null ? '<span class="dim">—</span>' : inr2(n);
+const againstOf = v => v.saas_subscription
+  ? 'Platform · ' + saasPlanOf(v.saas_subscription).name
+  : (memberOf(v.membership) ? memberOf(v.membership).first_name + ' ' + memberOf(v.membership).last_name : 'Deleted member');
+const nameCell = (p, sub) =>
+  '<span class="cell-name"><span class="avatar">' + esc(initials(p.first_name, p.last_name)) + '</span>' +
+  '<span class="col" style="min-width:0"><span class="nm">' + esc(p.first_name + ' ' + p.last_name) + '</span>' +
+  '<span class="em">' + esc(sub || p.email) + '</span></span></span>';
+const emptyRow = (cols, head, note) =>
+  '<tr><td colspan="' + cols + '"><div class="empty"><h3>' + esc(head) + '</h3><p class="t-sm">' + esc(note) + '</p></div></td></tr>';
+function filtBar(host, opts, active, onPick) {
+  host.innerHTML = opts.map(o =>
+    '<button class="filt" data-f="' + o.k + '" aria-pressed="' + (o.k === active ? 'true' : 'false') + '">' +
+    esc(o.label) + (o.n != null ? ' <span class="mono" style="margin-left:6px;opacity:.7">' + o.n + '</span>' : '') + '</button>').join('');
+  $$('[data-f]', host).forEach(b => b.onclick = () => onPick(b.dataset.f));
+}
+function pager(host, total, page, onPage) {
+  if (total === 0) { host.innerHTML = ''; return; }
+  const pages = Math.max(1, Math.ceil(total / PAGE));
+  const from = total === 0 ? 0 : page * PAGE + 1, to = Math.min(total, (page + 1) * PAGE);
+  host.innerHTML = '<p class="t-cap mono">' + from + '–' + to + ' of ' + total + '</p>' +
+    '<div class="row g8"><button class="btn btn-secondary btn-sm" data-p="prev"' + (page === 0 ? ' disabled' : '') + '>Previous</button>' +
+    '<button class="btn btn-secondary btn-sm" data-p="next"' + (page >= pages - 1 ? ' disabled' : '') + '>Next</button></div>';
+  $$('[data-p]', host).forEach(b => b.onclick = () => onPage(page + (b.dataset.p === 'next' ? 1 : -1)));
+}
+
+/* ── owner dashboard ────────────────────────────────────────────── */
+function renderDashboard() {
+  const me = session.me;
+  $('#dashHi').textContent = db.gym.name.split(' · ')[0] + ' overview';
+  const active = db.members.filter(memberIsActive).length;
+  const lapsed = db.members.length - active;
+  const openInv = db.invoices.filter(v => v.status === 'open' && v.membership);
+  const outstanding = openInv.reduce((s, v) => s + v.total_amount, 0);
+  const cap = saasPlanOf(db.saas_subscription.plan_id).max_members_allowed;
+  const kpis = [
+    { lab: 'Active members', icon: 'users', num: active, small: '/ ' + db.members.length,
+      foot: lapsed + ' lapsed · status derives from period end, not a stored flag' },
+    { lab: 'Outstanding', icon: 'receipt', num: inr(outstanding),
+      foot: openInv.length + ' open member invoice' + (openInv.length === 1 ? '' : 's') },
+    { lab: 'Seats used', icon: 'grid', num: db.members.length, small: '/ ' + cap,
+      foot: (cap - db.members.length) + ' left before POST /api/members returns 409' },
+    { lab: 'Trainers', icon: 'whistle', num: db.trainers.length,
+      foot: db.trainers.filter(t => !t.email_verified).length + ' awaiting email verification' }
+  ];
+  $('#ownerKpis').innerHTML = kpis.map(k =>
+    '<div class="card kpi"><p class="k-lab">' + svg(k.icon, 15) + esc(k.lab) + '</p>' +
+    '<p class="k-num">' + esc(String(k.num)) + (k.small ? ' <small>' + esc(k.small) + '</small>' : '') + '</p>' +
+    '<p class="k-foot">' + esc(k.foot) + '</p></div>').join('');
+
+  /* Bars are summed from settled invoices in the seed — no invented metric. */
+  const months = [];
+  for (let k = 5; k >= 0; k--) {
+    const d = new Date(2026, 7 - k, 1);
+    months.push({ y: d.getFullYear(), m: d.getMonth(), label: d.toLocaleDateString('en-IN', { month: 'short' }), v: 0 });
+  }
+  db.invoices.filter(v => v.status === 'settled').forEach(v => {
+    const d = new Date(v.issue_date);
+    const hit = months.find(x => x.y === d.getFullYear() && x.m === d.getMonth());
+    if (hit) hit.v += v.total_amount;
+  });
+  const peak = Math.max(1, ...months.map(m => m.v));
+  $('#collectBars').innerHTML = months.map((m, i) =>
+    '<div class="b' + (i === months.length - 1 ? ' now' : '') + '"><b>' + (m.v ? Math.round(m.v / 1000) + 'k' : '0') + '</b>' +
+    '<i style="height:' + Math.max(3, Math.round(m.v / peak * 104)) + 'px"></i><span>' + esc(m.label) + '</span></div>').join('');
+
+  const plan = saasPlanOf(db.saas_subscription.plan_id);
+  const pct = Math.min(100, Math.round(db.members.length / cap * 100));
+  $('#seatPanel').innerHTML =
+    '<p class="t-over">Current platform plan</p>' +
+    '<p class="t-h3" style="margin-top:8px">' + esc(plan.name) + '</p>' +
+    '<p class="t-cap" style="margin-top:4px">' + inr(plan.price) + ' every ' + plan.billing_interval_months + ' month' + (plan.billing_interval_months === 1 ? '' : 's') + '</p>' +
+    '<div class="meter ' + (pct >= 100 ? 'is-bad' : pct >= 85 ? 'is-warn' : '') + '" style="margin-top:16px"><i style="width:' + pct + '%"></i></div>' +
+    '<p class="t-cap" style="margin-top:8px">' + db.members.length + ' of ' + cap + ' member seats (' + pct + '%)</p>' +
+    '<hr class="sep" style="margin:16px 0" />' +
+    '<dl class="dl"><dt>Status</dt><dd>' + (me.subscription_status === 'active'
+      ? '<span class="chip chip-ok chip-dot">active</span>'
+      : '<span class="chip chip-bad chip-dot">' + esc(me.subscription_status.replace('_', ' ')) + '</span>') + '</dd>' +
+    '<dt>Renews</dt><dd class="mono">' + fmtDate(db.saas_subscription.current_period_end) + '</dd></dl>' +
+    '<button class="btn btn-secondary btn-block" style="margin-top:16px" data-nav="billing">Manage subscription</button>';
+
+  const recent = db.members.slice().sort((a, b) => dnum(b.join_date) - dnum(a.join_date)).slice(0, 6);
+  $('#recentMembers').innerHTML = recent.map(m =>
+    '<tr><td><button class="rowbtn" data-m="' + m.id + '">' + nameCell(m) + '</button></td>' +
+    '<td class="dim">' + esc(planOf(m.plan).name) + '</td>' +
+    '<td>' + memberStatusChip(m) + '</td>' +
+    '<td class="num dim">joined ' + fmtShort(m.join_date) + '</td></tr>').join('');
+  $$('#recentMembers [data-m]').forEach(b => b.onclick = () => openMemberDrawer(+b.dataset.m));
+}
+
+/* ── members ────────────────────────────────────────────────────── */
+const mState = { filt: 'all', q: '', page: 0 };
+function memberFiltered() {
+  let rows = visibleMembers().slice();
+  if (mState.filt === 'active') rows = rows.filter(memberIsActive);
+  if (mState.filt === 'lapsed') rows = rows.filter(m => !memberIsActive(m));
+  if (mState.filt === 'coached') rows = rows.filter(m => m.trainer);
+  if (mState.filt === 'unassigned') rows = rows.filter(m => !m.trainer);
+  if (mState.filt.indexOf('trainer:') === 0) rows = rows.filter(m => m.trainer === +mState.filt.slice(8));
+  const q = mState.q.trim().toLowerCase();
+  if (q) rows = rows.filter(m => (m.first_name + ' ' + m.last_name + ' ' + m.email + ' ' + m.phone).toLowerCase().includes(q));
+  return rows.sort((a, b) => dnum(b.join_date) - dnum(a.join_date));
+}
+function renderMembers() {
+  const all = visibleMembers();
+  $('#membersSub').textContent = all.length + ' membership records · status is derived from current_period_end, so it never goes stale.';
+  filtBar($('#memberFilters'), [
+    { k: 'all', label: 'All', n: all.length },
+    { k: 'active', label: 'Active', n: all.filter(memberIsActive).length },
+    { k: 'lapsed', label: 'Lapsed', n: all.filter(m => !memberIsActive(m)).length },
+    { k: 'coached', label: 'With trainer', n: all.filter(m => m.trainer).length },
+    { k: 'unassigned', label: 'Unassigned', n: all.filter(m => !m.trainer).length }
+  ].concat(mState.filt.indexOf('trainer:') === 0 && trainerOf(+mState.filt.slice(8))
+    ? [{ k: mState.filt, label: 'Coached by ' + trainerOf(+mState.filt.slice(8)).first_name,
+        n: all.filter(m => m.trainer === +mState.filt.slice(8)).length }] : []),
+    mState.filt, k => { mState.filt = k; mState.page = 0; renderMembers(); });
+  const s = $('#memberSearch');
+  if (s.value !== mState.q) s.value = mState.q;
+  s.oninput = () => { mState.q = s.value; mState.page = 0; paintMemberRows(); };
+  paintMemberRows();
+}
+function paintMemberRows() {
+  const rows = memberFiltered();
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  if (mState.page > pages - 1) mState.page = pages - 1;
+  const slice = rows.slice(mState.page * PAGE, mState.page * PAGE + PAGE);
+  $('#memberRows').innerHTML = slice.length ? slice.map(m => {
+    const t = trainerOf(m.trainer), days = dayDiff(m.current_period_end, TODAY);
+    return '<tr><td><button class="rowbtn" data-m="' + m.id + '">' + nameCell(m) + '</button></td>' +
+      '<td>' + esc(planOf(m.plan).name) + '</td>' +
+      '<td class="dim">' + (t ? esc(t.first_name + ' ' + t.last_name) : '<span class="dim">—</span>') + '</td>' +
+      '<td class="dim mono t-cap">' + fmtShort(m.join_date) + '</td>' +
+      '<td>' + memberStatusChip(m) + '</td>' +
+      '<td class="num">' + fmtShort(m.current_period_end) +
+      '<span class="dim" style="margin-left:8px">' + (days >= 0 ? 'in ' + days + 'd' : Math.abs(days) + 'd ago') + '</span></td>' +
+      '<td class="act"><button class="btn btn-ghost btn-sm" data-m="' + m.id + '">Open</button></td></tr>';
+  }).join('') : emptyRow(7, 'No members match those filters', 'Clear the search or pick a different filter.');
+  $$('#memberRows [data-m]').forEach(b => b.onclick = () => openMemberDrawer(+b.dataset.m));
+  pager($('#memberPager'), rows.length, mState.page, p => { mState.page = p; paintMemberRows(); });
+}
+
+/* Add member — the one flow that can honestly hit 409 SEAT_LIMIT_REACHED. */
+const planOptions = sel => db.membership_plans.map(p =>
+  '<option value="' + p.id + '"' + (p.id === sel ? ' selected' : '') + '>' + esc(p.name) + ' · ' + inr(p.price) + ' / ' + p.duration_days + 'd</option>').join('');
+const trainerOptions = sel => '<option value="">No trainer assigned</option>' + db.trainers.map(t =>
+  '<option value="' + t.id + '"' + (t.id === sel ? ' selected' : '') + '>' + esc(t.first_name + ' ' + t.last_name) + ' · ' + esc(t.specialization) + '</option>').join('');
+
+function openAddMember() {
+  const cap = saasPlanOf(db.saas_subscription.plan_id).max_members_allowed;
+  openLayer('<div class="veil"><div class="dlg dlg-wide" role="dialog" aria-modal="true" aria-labelledby="amTitle" data-od-id="dialog-add-member">' +
+    dlgHead('POST /api/members', 'Add member', 'The backend derives the first period end from the plan duration and raises the opening invoice.').replace('t-h3"', 't-h3" id="amTitle"') +
+    '<div class="dlg-bd col g20">' +
+    '<div id="amSeat"></div>' +
+    '<div class="grid g-2 g16">' +
+    '<div class="fld" id="fAmFirst"><label for="amFirst">First name <span class="req">*</span></label><input class="inp" id="amFirst" autocomplete="off" /><span class="err">Required.</span></div>' +
+    '<div class="fld" id="fAmLast"><label for="amLast">Last name <span class="req">*</span></label><input class="inp" id="amLast" autocomplete="off" /><span class="err">Required.</span></div>' +
+    '</div>' +
+    '<div class="grid g-2 g16">' +
+    '<div class="fld" id="fAmMail"><label for="amMail">Email <span class="req">*</span></label><input class="inp" id="amMail" type="email" autocomplete="off" /><span class="err">Enter a valid email address.</span></div>' +
+    '<div class="fld" id="fAmPhone"><label for="amPhone">Phone <span class="req">*</span></label><input class="inp" id="amPhone" autocomplete="off" placeholder="+91 …" /><span class="err">Required.</span></div>' +
+    '</div>' +
+    '<div class="grid g-2 g16">' +
+    '<div class="fld"><label for="amPlan">Membership plan</label><select class="inp" id="amPlan">' + planOptions(db.membership_plans[0].id) + '</select></div>' +
+    '<div class="fld"><label for="amTrainer">Trainer</label><select class="inp" id="amTrainer">' + trainerOptions(null) + '</select>' +
+    '<span class="hint">Optional. Trainer-inclusive plans usually get one.</span></div>' +
+    '</div>' +
+    '<div class="fld"><label for="amGoal">Goal</label><input class="inp" id="amGoal" placeholder="What are they training for?" /></div>' +
+    '<p class="callout"><b>' + db.members.length + ' / ' + cap + ' seats used.</b> A create past the cap returns <span class="mono">409 SEAT_LIMIT_REACHED</span> and the dialog stays open with the upgrade path.</p>' +
+    '</div>' +
+    '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Cancel</button>' +
+    '<button class="btn btn-primary" id="amSave">Create member</button></div>' +
+    '</div></div>', () => {
+    $('#amPlan').onchange = () => {
+      const p = planOf(+$('#amPlan').value);
+      if (p.includes_trainer && !$('#amTrainer').value) $('#amTrainer').value = String(db.trainers[0].id);
+    };
+    $('#amSave').onclick = async () => {
+      const ok = validate([
+        { f: 'fAmFirst', i: 'amFirst', test: notEmpty }, { f: 'fAmLast', i: 'amLast', test: notEmpty },
+        { f: 'fAmMail', i: 'amMail', test: isMail }, { f: 'fAmPhone', i: 'amPhone', test: notEmpty }
+      ]);
+      if (!ok) return;
+      const body = {
+        first_name: $('#amFirst').value.trim(), last_name: $('#amLast').value.trim(),
+        email: $('#amMail').value.trim(), phone: $('#amPhone').value.trim(),
+        plan: +$('#amPlan').value, trainer: $('#amTrainer').value ? +$('#amTrainer').value : null,
+        goal: $('#amGoal').value.trim() || 'General conditioning'
+      };
+      await withBusy($('#amSave'), 'Creating…', async () => {
+        try {
+          await request('POST', '/api/members', body);
+          const p = planOf(body.plan);
+          const m = Object.assign({}, body, {
+            id: ++db.seq.member, join_date: new Date(TODAY), photo_url: null,
+            current_period_end: new Date(dnum(TODAY) + p.duration_days * DAY)
+          });
+          db.members.push(m);
+          db.invoices.push(makeInvoice({ taxable: p.price, issue: new Date(TODAY), status: 'open', member: m.id, label: p.name, gst: !!db.gym.gstin }));
+          closeLayers(); renderNav(); renderMembers();
+          toast('ok', m.first_name + ' ' + m.last_name + ' added with an opening invoice.', null, 'Period ends ' + fmtDate(m.current_period_end) + '.');
+        } catch (err) {
+          handleError(err, {
+            onSeatLimit: e => {
+              $('#amSeat').innerHTML = '<div class="banner is-bad" style="margin:0" data-od-id="inline-seat-limit">' + svg('alert', 18) +
+                '<div style="min-width:0"><p><strong>Every seat on ' + esc(e.details.plan) + ' is taken (' + e.details.seats_used + ' / ' + e.details.max_members_allowed + ').</strong></p>' +
+                '<p class="b-sub">error.code · SEAT_LIMIT_REACHED — nothing was created. Move to a larger platform plan, or release a seat first.</p></div>' +
+                '<button class="btn btn-secondary btn-sm push" id="amUpgrade">Compare plans</button></div>';
+              $('#amUpgrade').onclick = () => { closeLayers(); go('billing'); showBillTab('saas'); };
+            },
+            onValidation: e => {
+              if (e.details && e.details.email) {
+                $('#fAmMail').dataset.bad = '1'; $('.err', $('#fAmMail')).textContent = e.details.email; $('#amMail').focus();
+              } else toast('bad', e.message, e.code);
+            }
+          });
+        }
+      });
+    };
+  });
+}
+
+/* ── member drawer (owner + trainer) ────────────────────────────── */
+function openMemberDrawer(id) {
+  const m = memberOf(id);
+  if (!m) { toast('bad', ERR_COPY.NOT_FOUND, 'NOT_FOUND'); return; }
+  const p = planOf(m.plan), t = trainerOf(m.trainer);
+  const invs = db.invoices.filter(v => v.membership === m.id).sort((a, b) => dnum(b.issue_date) - dnum(a.issue_date));
+  const days = dayDiff(m.current_period_end, TODAY);
+  const canEdit = session.me.role === 'owner';
+  openLayer('<div class="veil" style="justify-content:flex-end;padding:0"><aside class="drw" role="dialog" aria-modal="true" aria-label="Member record" data-od-id="drawer-member">' +
+    dlgHead('GET /api/members/' + m.id, m.first_name + ' ' + m.last_name) +
+    '<div class="drw-bd col g24">' +
+    '<div class="row g12"><span class="avatar avatar-lg">' + esc(initials(m.first_name, m.last_name)) + '</span>' +
+    '<div style="min-width:0"><div class="row g8">' + memberStatusChip(m) +
+    '<span class="chip">' + esc(p.name) + '</span></div>' +
+    '<p class="t-cap mono" style="margin-top:6px">member · id ' + m.id + '</p></div></div>' +
+    '<dl class="dl">' +
+    '<dt>Email</dt><dd class="mono t-cap">' + esc(m.email) + '</dd>' +
+    '<dt>Phone</dt><dd class="mono t-cap">' + esc(m.phone) + '</dd>' +
+    '<dt>Plan</dt><dd>' + esc(p.name) + ' · ' + inr(p.price) + ' / ' + p.duration_days + ' days</dd>' +
+    '<dt>Trainer</dt><dd>' + (t ? esc(t.first_name + ' ' + t.last_name) + ' <span class="dim">· ' + esc(t.specialization) + '</span>' : '<span class="dim">Unassigned</span>') + '</dd>' +
+    '<dt>Goal</dt><dd>' + esc(m.goal) + '</dd>' +
+    '<dt>Joined</dt><dd class="mono t-cap">' + fmtDate(m.join_date) + '</dd>' +
+    '<dt>Period ends</dt><dd class="mono t-cap">' + fmtDate(m.current_period_end) + ' · ' + (days >= 0 ? days + ' days left' : Math.abs(days) + ' days ago') + '</dd>' +
+    '</dl>' +
+    '<div><p class="t-over">Invoices against this membership</p>' +
+    '<div class="col g8" style="margin-top:10px">' + (invs.length ? invs.map(v =>
+      '<button class="panel row g12" data-v="' + v.id + '" style="text-align:left">' +
+      '<span class="col" style="min-width:0;gap:3px"><span class="mono t-cap">' + esc(v.number) + '</span>' +
+      '<span class="t-cap dim">' + fmtDate(v.issue_date) + ' · ' + esc(v.label) + '</span></span>' +
+      '<span class="push mono" style="font-weight:500">' + inr(v.total_amount) + '</span>' + invStatusChip(v) + '</button>').join('')
+      : '<p class="t-cap">No invoices raised yet.</p>') + '</div></div>' +
+    (canEdit ? '<div class="callout">Reassigning a trainer or changing plans is a <span class="mono">PATCH /api/members/' + m.id + '</span> — blocked with 402 while the platform subscription is past due.</div>' : '') +
+    '</div>' +
+    (canEdit ? '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Close</button>' +
+      '<button class="btn btn-primary" id="mdEdit">Edit membership</button></div>'
+      : '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Close</button></div>') +
+    '</aside></div>', host => {
+    $$('[data-v]', host).forEach(b => b.onclick = () => openInvoiceDrawer(+b.dataset.v));
+    if (canEdit) $('#mdEdit').onclick = () => openEditMember(m.id);
+  });
+}
+
+function openEditMember(id) {
+  const m = memberOf(id);
+  openLayer('<div class="veil"><div class="dlg" role="dialog" aria-modal="true" aria-label="Edit membership" data-od-id="dialog-edit-member">' +
+    dlgHead('PATCH /api/members/' + m.id, 'Edit membership', 'Changing the plan re-derives the period end from the new duration.') +
+    '<div class="dlg-bd col g20">' +
+    '<div class="fld"><label for="emPlan">Membership plan</label><select class="inp" id="emPlan">' + planOptions(m.plan) + '</select></div>' +
+    '<div class="fld"><label for="emTrainer">Trainer</label><select class="inp" id="emTrainer">' + trainerOptions(m.trainer) + '</select></div>' +
+    '<div class="fld"><label for="emGoal">Goal</label><input class="inp" id="emGoal" value="' + esc(m.goal) + '" /></div>' +
+    '</div>' +
+    '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Cancel</button>' +
+    '<button class="btn btn-primary" id="emSave">Save changes</button></div>' +
+    '</div></div>', () => {
+    $('#emSave').onclick = async () => {
+      const body = { plan: +$('#emPlan').value, trainer: $('#emTrainer').value ? +$('#emTrainer').value : null, goal: $('#emGoal').value.trim() };
+      await withBusy($('#emSave'), 'Saving…', async () => {
+        try {
+          await request('PATCH', '/api/members/' + m.id, body);
+          const changedPlan = body.plan !== m.plan;
+          Object.assign(m, body);
+          if (changedPlan) m.current_period_end = new Date(dnum(TODAY) + planOf(body.plan).duration_days * DAY);
+          closeLayers(); renderMembers(); if (route === 'dashboard') renderDashboard();
+          toast('ok', 'Membership updated.', null, changedPlan ? 'Period end re-derived from today to ' + fmtDate(m.current_period_end) + '.' : '');
+        } catch (err) { handleError(err); }
+      });
+    };
+  });
+}
+
+/* ── trainers ───────────────────────────────────────────────────── */
+function renderTrainers() {
+  $('#trainerCards').innerHTML = db.trainers.map(t => {
+    const load = db.members.filter(m => m.trainer === t.id);
+    const activeLoad = load.filter(memberIsActive).length;
+    return '<div class="card card-p col g16" data-od-id="card-trainer-' + t.id + '">' +
+      '<div class="row g12"><span class="avatar avatar-lg">' + esc(initials(t.first_name, t.last_name)) + '</span>' +
+      '<div style="min-width:0"><p class="t-h4">' + esc(t.first_name + ' ' + t.last_name) + '</p>' +
+      '<p class="t-cap">' + esc(t.specialization) + '</p></div></div>' +
+      '<div class="row g8 wrapz">' + (t.email_verified
+        ? '<span class="chip chip-ok chip-dot">email verified</span>'
+        : '<span class="chip chip-warn chip-dot">awaiting verification</span>') +
+      '<span class="chip">' + load.length + ' assigned</span></div>' +
+      '<dl class="dl">' +
+      '<dt>Email</dt><dd class="mono t-cap">' + esc(t.email) + '</dd>' +
+      '<dt>Phone</dt><dd class="mono t-cap">' + esc(t.phone) + '</dd>' +
+      '<dt>Roster</dt><dd>' + activeLoad + ' active · ' + (load.length - activeLoad) + ' lapsed</dd>' +
+      '</dl>' +
+      '<div class="row g8 wrapz">' +
+      (t.email_verified ? '' : '<button class="btn btn-secondary btn-sm" data-resend="' + t.id + '">Send set-password link</button>') +
+      '<button class="btn btn-ghost btn-sm" data-roster="' + t.id + '">View roster</button></div>' +
+      '</div>';
+  }).join('');
+  $$('#trainerCards [data-resend]').forEach(b => b.onclick = async () => {
+    const t = trainerOf(+b.dataset.resend);
+    await withBusy(b, 'Sending…', async () => {
+      try {
+        await request('POST', '/api/auth/password-reset', { email: t.email });
+        toast('ok', 'Reset link sent to ' + t.email + '.', null, 'The API answers 202 either way — it never confirms whether an address exists.');
+      } catch (err) { handleError(err); }
+    });
+  });
+  $$('#trainerCards [data-roster]').forEach(b => b.onclick = () => {
+    const t = trainerOf(+b.dataset.roster);
+    mState.filt = 'trainer:' + t.id; mState.q = ''; mState.page = 0;
+    $('#memberSearch').value = '';
+    go('members');
+  });
+}
+
+function openAddTrainer() {
+  openLayer('<div class="veil"><div class="dlg" role="dialog" aria-modal="true" aria-label="Add trainer" data-od-id="dialog-add-trainer">' +
+    dlgHead('POST /api/trainers', 'Add trainer', 'This also provisions their user account. They receive a verification email and set their own password.') +
+    '<div class="dlg-bd col g20">' +
+    '<div class="grid g-2 g16">' +
+    '<div class="fld" id="fAtFirst"><label for="atFirst">First name <span class="req">*</span></label><input class="inp" id="atFirst" /><span class="err">Required.</span></div>' +
+    '<div class="fld" id="fAtLast"><label for="atLast">Last name <span class="req">*</span></label><input class="inp" id="atLast" /><span class="err">Required.</span></div>' +
+    '</div>' +
+    '<div class="fld" id="fAtMail"><label for="atMail">Work email <span class="req">*</span></label><input class="inp" id="atMail" type="email" /><span class="err">Enter a valid email address.</span></div>' +
+    '<div class="fld" id="fAtPhone"><label for="atPhone">Phone <span class="req">*</span></label><input class="inp" id="atPhone" placeholder="+91 …" /><span class="err">Required.</span></div>' +
+    '<div class="fld" id="fAtSpec"><label for="atSpec">Specialization <span class="req">*</span></label><input class="inp" id="atSpec" placeholder="Strength &amp; conditioning" /><span class="err">Required.</span></div>' +
+    '</div>' +
+    '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Cancel</button>' +
+    '<button class="btn btn-primary" id="atSave">Create trainer</button></div>' +
+    '</div></div>', () => {
+    $('#atSave').onclick = async () => {
+      const ok = validate([
+        { f: 'fAtFirst', i: 'atFirst', test: notEmpty }, { f: 'fAtLast', i: 'atLast', test: notEmpty },
+        { f: 'fAtMail', i: 'atMail', test: isMail }, { f: 'fAtPhone', i: 'atPhone', test: notEmpty },
+        { f: 'fAtSpec', i: 'atSpec', test: notEmpty }
+      ]);
+      if (!ok) return;
+      const body = {
+        first_name: $('#atFirst').value.trim(), last_name: $('#atLast').value.trim(),
+        email: $('#atMail').value.trim(), phone: $('#atPhone').value.trim(), specialization: $('#atSpec').value.trim()
+      };
+      await withBusy($('#atSave'), 'Creating…', async () => {
+        try {
+          await request('POST', '/api/trainers', body);
+          db.trainers.push(Object.assign({ id: ++db.seq.trainer, email_verified: false }, body));
+          closeLayers(); renderNav(); renderTrainers();
+          toast('ok', body.first_name + ' can now set a password from the verification email.', null, 'Their login stays inactive until the email is verified.');
+        } catch (err) {
+          handleError(err, { onValidation: e => {
+            if (e.details && e.details.email) { $('#fAtMail').dataset.bad = '1'; $('.err', $('#fAtMail')).textContent = e.details.email; $('#atMail').focus(); }
+            else toast('bad', e.message, e.code);
+          } });
+        }
+      });
+    };
+  });
+}
+
+/* ── membership plans ───────────────────────────────────────────── */
+function renderPlans() {
+  $('#planRows').innerHTML = db.membership_plans.map(p => {
+    const on = db.members.filter(m => m.plan === p.id).length;
+    const inc = [p.includes_trainer ? 'Trainer' : null, p.includes_diet ? 'Diet plan' : null].filter(Boolean);
+    return '<tr><td><span class="nm" style="font-weight:500">' + esc(p.name) + '</span>' +
+      '<span class="em dim" style="display:block;font-size:12px">plan · id ' + p.id + '</span></td>' +
+      '<td class="num">' + inr(p.price) + '</td>' +
+      '<td class="num">' + p.duration_days + ' d</td>' +
+      '<td>' + (inc.length ? inc.map(x => '<span class="chip">' + esc(x) + '</span>').join(' ') : '<span class="dim">Floor access only</span>') + '</td>' +
+      '<td class="num">' + on + '</td>' +
+      '<td class="act"><button class="btn btn-ghost btn-sm" data-pe="' + p.id + '">Edit</button>' +
+      '<button class="btn btn-ghost btn-sm" data-pd="' + p.id + '">Delete</button></td></tr>';
+  }).join('');
+  $$('#planRows [data-pe]').forEach(b => b.onclick = () => openPlanDialog(+b.dataset.pe));
+  $$('#planRows [data-pd]').forEach(b => b.onclick = () => openPlanDelete(+b.dataset.pd));
+}
+
+function openPlanDialog(id) {
+  const p = id ? planOf(id) : null;
+  openLayer('<div class="veil"><div class="dlg" role="dialog" aria-modal="true" aria-label="Membership plan" data-od-id="dialog-plan">' +
+    dlgHead(p ? 'PATCH /api/membership-plans/' + p.id : 'POST /api/membership-plans', p ? 'Edit plan' : 'New membership plan',
+      'Duration drives the derived period end on every member holding this plan.') +
+    '<div class="dlg-bd col g20">' +
+    '<div class="fld" id="fPlName"><label for="plName">Plan name <span class="req">*</span></label>' +
+    '<input class="inp" id="plName" value="' + esc(p ? p.name : '') + '" placeholder="Monthly Floor Access" /><span class="err">Required.</span></div>' +
+    '<div class="grid g-2 g16">' +
+    '<div class="fld" id="fPlPrice"><label for="plPrice">Price (INR) <span class="req">*</span></label>' +
+    '<input class="inp mono" id="plPrice" inputmode="numeric" value="' + (p ? p.price : '') + '" /><span class="err">Enter an amount above zero.</span></div>' +
+    '<div class="fld" id="fPlDays"><label for="plDays">Duration (days) <span class="req">*</span></label>' +
+    '<input class="inp mono" id="plDays" inputmode="numeric" value="' + (p ? p.duration_days : '') + '" /><span class="err">Enter a whole number of days.</span></div>' +
+    '</div>' +
+    '<div><hr class="sep" />' +
+    '<div class="swrow"><div><p class="t-sm" style="font-weight:500">Includes trainer</p>' +
+    '<p class="t-cap">New members on this plan get a coach assigned at the desk.</p></div>' +
+    '<label class="sw"><input type="checkbox" id="plTrainer"' + (p && p.includes_trainer ? ' checked' : '') + ' /><i></i></label></div>' +
+    '<hr class="sep" />' +
+    '<div class="swrow"><div><p class="t-sm" style="font-weight:500">Includes diet plan</p>' +
+    '<p class="t-cap">Nutrition consult bundled into the price.</p></div>' +
+    '<label class="sw"><input type="checkbox" id="plDiet"' + (p && p.includes_diet ? ' checked' : '') + ' /><i></i></label></div>' +
+    '<hr class="sep" /></div>' +
+    '</div>' +
+    '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Cancel</button>' +
+    '<button class="btn btn-primary" id="plSave">' + (p ? 'Save plan' : 'Create plan') + '</button></div>' +
+    '</div></div>', () => {
+    $('#plSave').onclick = async () => {
+      const ok = validate([
+        { f: 'fPlName', i: 'plName', test: notEmpty },
+        { f: 'fPlPrice', i: 'plPrice', test: v => /^\d+$/.test(v) && +v > 0 },
+        { f: 'fPlDays', i: 'plDays', test: v => /^\d+$/.test(v) && +v > 0 }
+      ]);
+      if (!ok) return;
+      const body = {
+        name: $('#plName').value.trim(), price: +$('#plPrice').value, currency: 'INR',
+        duration_days: +$('#plDays').value, includes_trainer: $('#plTrainer').checked, includes_diet: $('#plDiet').checked
+      };
+      await withBusy($('#plSave'), 'Saving…', async () => {
+        try {
+          await request(p ? 'PATCH' : 'POST', '/api/membership-plans' + (p ? '/' + p.id : ''), body);
+          if (p) Object.assign(p, body); else db.membership_plans.push(Object.assign({ id: ++db.seq.plan }, body));
+          closeLayers(); renderNav(); renderPlans();
+          toast('ok', p ? 'Plan updated.' : 'Plan created.', null, p ? 'Members keep their existing period end until renewal.' : '');
+        } catch (err) { handleError(err); }
+      });
+    };
+  });
+}
+
+function openPlanDelete(id) {
+  const p = planOf(id), on = db.members.filter(m => m.plan === id).length;
+  openLayer('<div class="veil"><div class="dlg" role="dialog" aria-modal="true" aria-label="Delete plan" data-od-id="dialog-plan-delete">' +
+    dlgHead('DELETE /api/membership-plans/' + p.id, 'Delete ' + p.name + '?',
+      on ? 'The API refuses to delete a plan that memberships still point at.' : 'Nothing points at this plan, so the delete will go through.') +
+    '<div class="dlg-bd col g16">' +
+    (on ? '<div class="banner is-warn" style="margin:0">' + svg('alert', 18) +
+      '<div><p><strong>' + on + ' membership' + (on === 1 ? '' : 's') + ' still on this plan.</strong></p>' +
+      '<p class="b-sub">Move them to another plan first — the backend returns <span class="mono">409 CONFLICT</span> otherwise.</p></div></div>'
+      : '<p class="t-sm">This removes the plan from the catalogue. Past invoices keep their own line description.</p>') +
+    '</div>' +
+    '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Cancel</button>' +
+    (on ? '<button class="btn btn-danger" disabled>Delete plan</button>'
+      : '<button class="btn btn-danger" id="pdGo">Delete plan</button>') + '</div>' +
+    '</div></div>', () => {
+    if (on) return;
+    $('#pdGo').onclick = async () => {
+      await withBusy($('#pdGo'), 'Deleting…', async () => {
+        try {
+          await request('DELETE', '/api/membership-plans/' + p.id);
+          db.membership_plans = db.membership_plans.filter(x => x.id !== p.id);
+          closeLayers(); renderNav(); renderPlans();
+          toast('ok', p.name + ' deleted.', null);
+        } catch (err) { handleError(err); }
+      });
+    };
+  });
+}
+
+/* ── billing ────────────────────────────────────────────────────── */
+const bState = { tab: 'invoices', filt: 'all', page: 0 };
+function showBillTab(tab) {
+  bState.tab = tab;
+  $$('#billTabs .tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  $('#billInvoices').hidden = tab !== 'invoices';
+  $('#billSaas').hidden = tab !== 'saas';
+  if (tab === 'saas') renderSaasTab(); else paintInvoiceRows();
+}
+$$('#billTabs .tab').forEach(b => b.onclick = () => showBillTab(b.dataset.tab));
+
+function invFiltered() {
+  let rows = visibleInvoices().slice();
+  if (bState.filt === 'open') rows = rows.filter(v => v.status === 'open');
+  if (bState.filt === 'overdue') rows = rows.filter(v => v.status === 'open' && dnum(v.due_date) < dnum(TODAY));
+  if (bState.filt === 'settled') rows = rows.filter(v => v.status === 'settled');
+  if (bState.filt === 'closed') rows = rows.filter(v => v.status === 'void' || v.status === 'refunded');
+  if (bState.filt === 'platform') rows = rows.filter(v => v.saas_subscription);
+  return rows.sort((a, b) => dnum(b.issue_date) - dnum(a.issue_date));
+}
+function renderBilling() {
+  const all = visibleInvoices();
+  filtBar($('#invoiceFilters'), [
+    { k: 'all', label: 'All', n: all.length },
+    { k: 'open', label: 'Open', n: all.filter(v => v.status === 'open').length },
+    { k: 'overdue', label: 'Overdue', n: all.filter(v => v.status === 'open' && dnum(v.due_date) < dnum(TODAY)).length },
+    { k: 'settled', label: 'Settled', n: all.filter(v => v.status === 'settled').length },
+    { k: 'closed', label: 'Void / refunded', n: all.filter(v => v.status === 'void' || v.status === 'refunded').length },
+    { k: 'platform', label: 'Platform', n: all.filter(v => v.saas_subscription).length }
+  ], bState.filt, k => { bState.filt = k; bState.page = 0; paintInvoiceRows(); });
+  showBillTab(bState.tab);
+}
+function paintInvoiceRows() {
+  const rows = invFiltered();
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  if (bState.page > pages - 1) bState.page = pages - 1;
+  const openTotal = rows.filter(v => v.status === 'open').reduce((s, v) => s + v.total_amount, 0);
+  const settledTotal = rows.filter(v => v.status === 'settled').reduce((s, v) => s + v.total_amount, 0);
+  $('#invoiceTotals').textContent = 'open ' + inr(openTotal) + '  ·  settled ' + inr(settledTotal);
+  const slice = rows.slice(bState.page * PAGE, bState.page * PAGE + PAGE);
+  $('#invoiceRows').innerHTML = slice.length ? slice.map(v =>
+    '<tr><td><button class="rowbtn" data-v="' + v.id + '"><span class="col" style="gap:2px">' +
+    '<span class="nm mono">' + esc(v.number) + '</span>' +
+    '<span class="em">' + fmtShort(v.issue_date) + ' · due ' + fmtShort(v.due_date) + '</span></span></button></td>' +
+    '<td><span class="col" style="gap:2px"><span>' + esc(againstOf(v)) + '</span>' +
+    '<span class="em dim" style="font-size:12px">' + esc(v.label) + '</span></span></td>' +
+    '<td class="num">' + inr2(v.taxable_value) + '</td>' +
+    '<td class="num">' + taxCell(v.cgst) + '</td>' +
+    '<td class="num">' + taxCell(v.sgst) + '</td>' +
+    '<td class="num">' + taxCell(v.igst) + '</td>' +
+    '<td class="num" style="font-weight:500">' + inr2(v.total_amount) + '</td>' +
+    '<td>' + invStatusChip(v) + '</td>' +
+    '<td class="act">' + (v.status === 'open'
+      ? '<button class="btn btn-secondary btn-sm" data-pay="' + v.id + '">Pay</button>'
+      : '<button class="btn btn-ghost btn-sm" data-v="' + v.id + '">Open</button>') + '</td></tr>').join('')
+    : emptyRow(9, 'No invoices in this view', 'Pick another filter to see the rest of the ledger.');
+  $$('#invoiceRows [data-v]').forEach(b => b.onclick = () => openInvoiceDrawer(+b.dataset.v));
+  $$('#invoiceRows [data-pay]').forEach(b => b.onclick = () => openPayFlow(+b.dataset.pay));
+  pager($('#invoicePager'), rows.length, bState.page, p => { bState.page = p; paintInvoiceRows(); });
+}
+
+function renderSaasTab() {
+  const cur = saasPlanOf(db.saas_subscription.plan_id);
+  const used = db.members.length;
+  const open = openSaasInvoice();
+  const st = session.me.subscription_status;
+  $('#saasCurrent').innerHTML = '<div class="card card-p col g16" style="margin-bottom:24px">' +
+    '<div class="row g12 wrapz"><div><p class="t-over">Current subscription</p>' +
+    '<p class="t-h3" style="margin-top:6px">' + esc(cur.name) + ' · ' + inr(cur.price) + '<span class="dim t-sm"> / ' + cur.billing_interval_months + ' mo</span></p></div>' +
+    '<span class="push">' + (st === 'active' ? '<span class="chip chip-ok chip-dot">active</span>'
+      : '<span class="chip chip-bad chip-dot">' + esc(st.replace('_', ' ')) + '</span>') + '</span></div>' +
+    '<dl class="dl"><dt>Seats</dt><dd class="mono">' + used + ' / ' + cur.max_members_allowed + '</dd>' +
+    '<dt>Renews</dt><dd class="mono">' + fmtDate(db.saas_subscription.current_period_end) + '</dd>' +
+    '<dt>Writes</dt><dd>' + (writesBlocked()
+      ? '<span class="chip chip-bad chip-dot">locked · 402</span> <span class="dim t-cap">paying an invoice still works</span>'
+      : '<span class="chip chip-ok chip-dot">open</span>') + '</dd></dl>' +
+    (open ? '<div class="banner is-warn" style="margin:0">' + svg('receipt', 18) +
+      '<div style="min-width:0"><p><strong>' + esc(open.number) + ' for ' + inr(open.total_amount) + ' is outstanding.</strong></p>' +
+      '<p class="b-sub">Due ' + fmtDate(open.due_date) + '. Settling it restores writes immediately.</p></div>' +
+      '<button class="btn btn-primary btn-sm push" id="saasPay">Pay ' + inr(open.total_amount) + '</button></div>' : '') +
+    '</div>';
+  if (open) $('#saasPay').onclick = () => openPayFlow(open.id);
+
+  $('#saasTiers').innerHTML = db.saas_plans.map(p => {
+    const isCur = p.id === db.saas_subscription.plan_id;
+    const tooSmall = p.max_members_allowed < used;
+    return '<div class="card plan-tier' + (isCur ? ' cur' : '') + '" data-od-id="tier-' + p.id + '">' +
+      '<div class="row g8"><p class="t-h4">' + esc(p.name) + '</p>' + (isCur ? '<span class="chip on push">current</span>' : '') + '</div>' +
+      '<p class="price">' + inr(p.price) + '<small> / ' + p.billing_interval_months + ' mo</small></p>' +
+      '<div class="col g8">' +
+      '<p class="tick">' + svg('check', 15) + '<span>Up to ' + p.max_members_allowed + ' member seats</span></p>' +
+      '<p class="tick">' + svg('check', 15) + '<span>GST invoicing with sequential numbering</span></p>' +
+      '<p class="tick">' + svg('check', 15) + '<span>Unlimited trainer logins</span></p>' +
+      (p.billing_interval_months > 1 ? '<p class="tick">' + svg('check', 15) + '<span>Billed every ' + p.billing_interval_months + ' months</span></p>' : '') +
+      '</div>' +
+      '<div style="flex:1"></div>' +
+      (isCur ? '<p class="tier-note">Seat cap ' + p.max_members_allowed + ' · renews ' + fmtShort(db.saas_subscription.current_period_end) + '</p>'
+        : tooSmall ? '<p class="tier-note dim">Below your ' + used + ' seats · <span class="mono">PLAN_DOWNGRADE_BLOCKED</span></p>'
+        : '<p class="tier-note dim">+' + (p.max_members_allowed - cur.max_members_allowed) + ' seats over ' + esc(cur.name) + '</p>') +
+      '</div>';
+  }).join('');
+}
+
+/* ── invoice drawer ─────────────────────────────────────────────── */
+function openInvoiceDrawer(id) {
+  const v = invoiceOf(id);
+  if (!v) { toast('bad', ERR_COPY.NOT_FOUND, 'NOT_FOUND'); return; }
+  const pay = paymentFor(v.id);
+  const noGst = v.cgst == null;
+  openLayer('<div class="veil" style="justify-content:flex-end;padding:0"><aside class="drw" role="dialog" aria-modal="true" aria-label="Invoice" data-od-id="drawer-invoice">' +
+    dlgHead('GET /api/invoices/' + v.id, v.number) +
+    '<div class="drw-bd col g24">' +
+    '<div class="row g8 wrapz">' + invStatusChip(v) +
+    '<span class="chip">FY ' + esc(v.financial_year) + '</span>' +
+    '<span class="chip">seq ' + v.sequence_no + '</span></div>' +
+    '<div class="rcpt">' +
+    '<div class="rcpt-row"><span class="dim">Against</span><span>' + esc(againstOf(v)) + '</span></div>' +
+    '<div class="rcpt-row"><span class="dim">Description</span><span>' + esc(v.label) + '</span></div>' +
+    '<div class="rcpt-row"><span class="dim">HSN / SAC</span><span class="mono">' + esc(v.hsn_sac) + '</span></div>' +
+    '<hr class="sep" style="margin:8px 0" />' +
+    '<div class="rcpt-row"><span class="dim">Taxable value</span><span class="mono">' + inr2(v.taxable_value) + '</span></div>' +
+    '<div class="rcpt-row"><span class="dim">CGST 9%</span><span class="mono">' + taxCell(v.cgst) + '</span></div>' +
+    '<div class="rcpt-row"><span class="dim">SGST 9%</span><span class="mono">' + taxCell(v.sgst) + '</span></div>' +
+    '<div class="rcpt-row"><span class="dim">IGST</span><span class="mono">' + taxCell(v.igst) + '</span></div>' +
+    '<div class="rcpt-row tot"><span>Total</span><span class="mono">' + inr2(v.total_amount) + '</span></div>' +
+    '</div>' +
+    (noGst ? '<p class="callout">Tax fields are <span class="mono">null</span> on this invoice — it predates the tenant GSTIN, so the UI prints an em dash rather than ₹0.00.</p>' : '') +
+    '<dl class="dl">' +
+    '<dt>Issued</dt><dd class="mono t-cap">' + fmtDate(v.issue_date) + '</dd>' +
+    '<dt>Due</dt><dd class="mono t-cap">' + fmtDate(v.due_date) + '</dd>' +
+    '<dt>Currency</dt><dd class="mono t-cap">' + esc(v.currency) + '</dd>' +
+    '</dl>' +
+    (pay ? '<div><p class="t-over">Payment</p><dl class="dl" style="margin-top:10px">' +
+      '<dt>Status</dt><dd><span class="chip chip-ok chip-dot">' + esc(pay.status) + '</span></dd>' +
+      '<dt>Method</dt><dd class="mono t-cap">' + esc(pay.method) + '</dd>' +
+      '<dt>Paid at</dt><dd class="mono t-cap">' + fmtDate(pay.paid_at) + '</dd>' +
+      '<dt>Order ref</dt><dd class="mono t-cap">' + esc(pay.order_ref) + '</dd></dl></div>' : '') +
+    '</div>' +
+    '<div class="dlg-ft"><button class="btn btn-secondary" data-close>Close</button>' +
+    (v.status === 'open' ? '<button class="btn btn-primary" id="ivPay">Pay ' + inr(v.total_amount) + '</button>' : '') +
+    (pay ? '<button class="btn btn-secondary" id="ivRcpt">Get receipt</button>' : '') +
+    '</div></aside></div>', () => {
+    if (v.status === 'open') $('#ivPay').onclick = () => openPayFlow(v.id);
+    if (pay) $('#ivRcpt').onclick = async () => {
+      await withBusy($('#ivRcpt'), 'Fetching…', async () => {
+        try {
+          await request('GET', '/api/payments/' + pay.id + '/receipt');
+          toast('ok', 'Receipt for ' + v.number + ' is ready.', null, 'GET /api/payments/' + pay.id + '/receipt returned a signed PDF URL.');
+        } catch (err) { handleError(err); }
+      });
+    };
+  });
+}
+
+/* ── Razorpay pay flow ──────────────────────────────────────────────
+   POST /api/invoices/{id}/pay returns an order. Checkout happens in the
+   gateway. Settlement lands via webhook, so the client polls the invoice
+   instead of trusting the checkout callback.                            */
+const stepsHTML = items => '<div class="steps">' + items.map(s =>
+  '<div class="step ' + s.state + '"><span class="sdot">' +
+  (s.state === 'done' ? svg('check', 12) : s.state === 'live' ? '<span class="spin"></span>' : '') + '</span>' +
+  '<span class="col" style="gap:2px;min-width:0"><span class="st">' + esc(s.t) + '</span>' +
+  '<span class="sm">' + esc(s.m) + '</span></span></div>').join('') + '</div>';
+
+function settleInvoice(v, method) {
+  v.status = 'settled';
+  const p = { id: 900 + (++db.seq.pay), invoice: v.id, status: 'succeeded', amount: v.total_amount,
+    method: method, paid_at: new Date(TODAY), order_ref: 'order_' + v.number.replace(/\W/g, '') };
+  db.payments.push(p);
+  if (v.saas_subscription) {
+    const plan = saasPlanOf(db.saas_subscription.plan_id);
+    db.saas_subscription.status = 'active';
+    db.saas_subscription.current_period_end = new Date(new Date(TODAY).setMonth(new Date(TODAY).getMonth() + plan.billing_interval_months));
+    if (session.me.role === 'owner') {
+      session.me.subscription_status = 'active';
+      session.me.current_period_end = db.saas_subscription.current_period_end;
+      IDENTITIES.find(i => i.key === session.identity).user.subscription_status = 'active';
+    }
+  } else {
+    const m = memberOf(v.membership);
+    if (m) {
+      const dur = planOf(m.plan).duration_days;
+      const base = Math.max(dnum(TODAY), dnum(m.current_period_end));
+      m.current_period_end = new Date(base + dur * DAY);
+      if (session.me.member_profile_id === m.id) {
+        session.me.is_active_member = true;
+        session.me.current_period_end = m.current_period_end;
+      }
+    }
+  }
+  renderNav(); renderBanner();
+  return p;
+}
+
+function openPayFlow(id) {
+  const v = invoiceOf(id);
+  if (!v) { toast('bad', ERR_COPY.NOT_FOUND, 'NOT_FOUND'); return; }
+  if (v.status !== 'open') { toast('info', 'That invoice is already ' + v.status + '.', null); return; }
+  let phase = 'order', order = null, method = 'upi', polls = 0, payment = null;
+
+  openLayer('<div class="veil"><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="pfTitle" data-od-id="dialog-pay">' +
+    dlgHead('POST /api/invoices/' + v.id + '/pay', 'Pay ' + v.number,
+      'Razorpay holds the card data. This console never sees it.').replace('t-h3"', 't-h3" id="pfTitle"') +
+    '<div class="dlg-bd col g20" id="pfBody"></div><div class="dlg-ft" id="pfFt"></div>' +
+    '</div></div>', () => { paint(); const g = $('#pfGo'); if (g) g.focus(); });
+
+  function amountBlock() {
+    return '<div class="rcpt">' +
+      '<div class="rcpt-row"><span class="dim">Invoice</span><span class="mono">' + esc(v.number) + '</span></div>' +
+      '<div class="rcpt-row"><span class="dim">Taxable</span><span class="mono">' + inr2(v.taxable_value) + '</span></div>' +
+      '<div class="rcpt-row"><span class="dim">CGST + SGST</span><span class="mono">' +
+      (v.cgst == null ? '<span class="dim">—</span>' : inr2(v.cgst + v.sgst)) + '</span></div>' +
+      '<div class="rcpt-row tot"><span>Amount due</span><span class="mono">' + inr2(v.total_amount) + '</span></div></div>';
+  }
+
+  function paint() {
+    const body = $('#pfBody'), ft = $('#pfFt');
+    if (phase === 'order') {
+      body.innerHTML = amountBlock() +
+        (writesBlocked() ? '<p class="callout"><b>Writes are locked at 402 right now.</b> Paying is the one mutation the backend still accepts — that is how a past-due tenant recovers.</p>' : '') +
+        stepsHTML([
+          { state: 'live', t: 'Create a Razorpay order', m: 'The server returns order_id, amount in paise and the public key.' },
+          { state: 'wait', t: 'Checkout in the gateway', m: 'UPI, card or netbanking — handled outside this app.' },
+          { state: 'wait', t: 'Wait for the webhook', m: 'The invoice flips to settled server-side, then we re-read it.' }
+        ]);
+      ft.innerHTML = '<button class="btn btn-secondary" data-close>Cancel</button>' +
+        '<button class="btn btn-primary" id="pfGo">Create order</button>';
+      $('[data-close]', ft).onclick = closeLayers;
+      $('#pfGo').onclick = async () => {
+        await withBusy($('#pfGo'), 'Creating…', async () => {
+          try {
+            await request('POST', '/api/invoices/' + v.id + '/pay', {});
+            order = { order_id: 'order_' + Math.random().toString(36).slice(2, 12), amount_paise: Math.round(v.total_amount * 100), key_id: 'rzp_test_IronStd0001' };
+            phase = 'checkout'; paint();
+          } catch (err) { closeLayers(); handleError(err); }
+        });
+      };
+    } else if (phase === 'checkout') {
+      const opts = [['upi', 'UPI', 'Any app · collect request'], ['card', 'Card', 'Visa / Mastercard / RuPay'], ['netbanking', 'Netbanking', '50+ banks']];
+      body.innerHTML = '<div class="callout"><b>Gateway checkout · ' + esc(order.key_id) + '</b><br />order ' +
+        esc(order.order_id) + ' · ' + order.amount_paise + ' paise</div>' +
+        '<div class="col g8">' + opts.map(o =>
+          '<button class="panel row g12" data-pm="' + o[0] + '" style="text-align:left' + (o[0] === method ? ';border-color:var(--fg)' : '') + '">' +
+          '<span class="col" style="gap:2px;min-width:0"><span class="t-sm" style="font-weight:500">' + esc(o[1]) + '</span>' +
+          '<span class="t-cap">' + esc(o[2]) + '</span></span>' +
+          (o[0] === method ? '<span class="chip push">selected</span>' : '') + '</button>').join('') + '</div>' +
+        '<p class="t-cap">Card details are entered on Razorpay. Nothing sensitive is posted to this origin.</p>';
+      $$('[data-pm]', body).forEach(b => b.onclick = () => { method = b.dataset.pm; paint(); });
+      ft.innerHTML = '<button class="btn btn-secondary" data-close>Cancel</button>' +
+        '<button class="btn btn-primary" id="pfPay">Pay ' + inr2(v.total_amount) + '</button>';
+      $('[data-close]', ft).onclick = closeLayers;
+      $('#pfPay').onclick = async () => {
+        await withBusy($('#pfPay'), 'Authorising…', async () => { await sleep(900); });
+        phase = 'polling'; paint(); pollLoop();
+      };
+    } else if (phase === 'polling') {
+      body.innerHTML = stepsHTML([
+        { state: 'done', t: 'Order created', m: order.order_id },
+        { state: 'done', t: 'Payment authorised', m: method.toUpperCase() + ' · awaiting capture confirmation' },
+        { state: 'live', t: 'Re-reading the invoice', m: 'GET /api/invoices/' + v.id + ' · attempt ' + Math.max(1, polls) }
+      ]) + '<p class="t-cap">The webhook is the source of truth, so the UI waits for the invoice to say settled rather than trusting the checkout callback.</p>';
+      ft.innerHTML = '<button class="btn btn-secondary" disabled>Waiting for the webhook…</button>';
+    } else {
+      body.innerHTML = stepsHTML([
+        { state: 'done', t: 'Order created', m: order.order_id },
+        { state: 'done', t: 'Payment authorised', m: method.toUpperCase() },
+        { state: 'done', t: 'Invoice settled', m: 'Confirmed by re-reading the invoice after the webhook landed.' }
+      ]) +
+        '<div class="rcpt"><div class="rcpt-row"><span class="dim">Payment</span><span class="mono">#' + payment.id + '</span></div>' +
+        '<div class="rcpt-row"><span class="dim">Method</span><span class="mono">' + esc(payment.method) + '</span></div>' +
+        '<div class="rcpt-row"><span class="dim">Paid</span><span class="mono">' + fmtDate(payment.paid_at) + '</span></div>' +
+        '<div class="rcpt-row tot"><span>Settled</span><span class="mono">' + inr2(payment.amount) + '</span></div></div>' +
+        (v.saas_subscription ? '<p class="callout"><b>Writes are open again.</b> The subscription is active until ' + fmtDate(db.saas_subscription.current_period_end) + '.</p>'
+          : '<p class="callout"><b>Membership extended.</b> Period now ends ' + fmtDate(memberOf(v.membership).current_period_end) + '.</p>');
+      ft.innerHTML = '<button class="btn btn-secondary" id="pfRcpt">Get receipt</button>' +
+        '<button class="btn btn-primary" data-close>Done</button>';
+      $('[data-close]', ft).onclick = closeLayers;
+      $('#pfRcpt').onclick = async () => {
+        await withBusy($('#pfRcpt'), 'Fetching…', async () => {
+          try {
+            await request('GET', '/api/payments/' + payment.id + '/receipt');
+            toast('ok', 'Receipt for ' + v.number + ' is ready.', null, 'GET /api/payments/' + payment.id + '/receipt');
+          } catch (err) { handleError(err); }
+        });
+      };
+    }
+  }
+
+  async function pollLoop() {
+    /* The mock webhook lands on the second read, exactly like the real race. */
+    while (polls < 6) {
+      polls++; paint();
+      await sleep(700);
+      if (!$('#pfBody')) return;            // dialog was closed mid-flight
+      if (polls >= 2) {
+        payment = settleInvoice(v, method);
+        phase = 'done'; paint();
+        repaintCurrentScreen();
+        toast('ok', v.number + ' settled.', null, inr2(v.total_amount) + ' captured via ' + method.toUpperCase() + '.');
+        return;
+      }
+    }
+    phase = 'checkout'; paint();
+    toast('bad', 'The webhook has not landed yet. The invoice is unchanged.', null, 'Re-open the invoice in a moment — settlement is asynchronous.');
+  }
+}
+function repaintCurrentScreen() { (SCREENS[route] || function () {})(); }
+
+/* ── gym settings ───────────────────────────────────────────────── */
+const gymSnapshot = () => ({ name: db.gym.name, contact_email: db.gym.contact_email, contact_phone: db.gym.contact_phone, timezone: db.gym.timezone, gstin: db.gym.gstin || '' });
+const gymFormValues = () => ({ name: $('#gymName').value.trim(), contact_email: $('#gymMail').value.trim(), contact_phone: $('#gymPhone').value.trim(), timezone: $('#gymTz').value, gstin: $('#gymGst').value.trim() });
+function fillGymForm() {
+  const g = gymSnapshot();
+  $('#gymName').value = g.name; $('#gymSlug').value = db.gym.slug;
+  $('#gymMail').value = g.contact_email; $('#gymPhone').value = g.contact_phone;
+  $('#gymTz').value = g.timezone; $('#gymGst').value = g.gstin;
+  gymDirtyCheck();
+}
+function gymDirtyCheck() {
+  const a = gymSnapshot(), b = gymFormValues();
+  const keys = Object.keys(a).filter(k => a[k] !== b[k]);
+  $('#gymDirty').textContent = keys.length
+    ? keys.length + ' unsaved change' + (keys.length === 1 ? '' : 's') + ' · ' + keys.join(', ')
+    : 'No unsaved changes.';
+  $('#gymSave').disabled = keys.length === 0;
+  $('#gymReset').disabled = keys.length === 0;
+  return keys;
+}
+function renderSettings() {
+  fillGymForm();
+  $('#tenancyFacts').innerHTML =
+    '<dt>Slug</dt><dd class="mono t-cap">' + esc(db.gym.slug) + '</dd>' +
+    '<dt>Created</dt><dd class="mono t-cap">' + fmtDate(db.gym.created) + '</dd>' +
+    '<dt>Tenant state</dt><dd>' + (db.gym.is_active ? '<span class="chip chip-ok chip-dot">active</span>' : '<span class="chip chip-bad chip-dot">suspended</span>') + '</dd>' +
+    '<dt>Platform plan</dt><dd>' + esc(saasPlanOf(db.saas_subscription.plan_id).name) + '</dd>' +
+    '<dt>Seats</dt><dd class="mono t-cap">' + db.members.length + ' / ' + saasPlanOf(db.saas_subscription.plan_id).max_members_allowed + '</dd>' +
+    '<dt>GST invoicing</dt><dd>' + (db.gym.gstin ? '<span class="chip chip-ok chip-dot">on</span>' : '<span class="chip chip-warn chip-dot">no GSTIN</span>') + '</dd>' +
+    '<dt>Your role</dt><dd class="mono t-cap">owner</dd>';
+}
+$$('#gymForm input, #gymForm select').forEach(el => el.oninput = gymDirtyCheck);
+$('#gymTz').onchange = gymDirtyCheck;
+$('#gymReset').onclick = () => { fillGymForm(); toast('info', 'Reverted to the saved gym record.', null); };
+$('#gymForm').onsubmit = async e => {
+  e.preventDefault();
+  const ok = validate([
+    { f: 'fGymName', i: 'gymName', test: notEmpty },
+    { f: 'fGymMail', i: 'gymMail', test: isMail },
+    { f: 'fGymPhone', i: 'gymPhone', test: notEmpty },
+    { f: 'fGymGst', i: 'gymGst', test: v => v.length === 0 || v.length === 15 }
+  ]);
+  if (!ok) return;
+  const body = gymFormValues();
+  let saved = false;
+  await withBusy($('#gymSave'), 'Saving…', async () => {
+    try {
+      await request('PATCH', '/api/gym', body);
+      const droppedGst = !!db.gym.gstin && !body.gstin;
+      Object.assign(db.gym, body, { gstin: body.gstin || null });
+      $('#brandName').textContent = db.gym.name.split(' · ')[0];
+      saved = true;
+      toast('ok', 'Gym profile saved.', null, droppedGst ? 'Future invoices will carry null CGST/SGST.' : '');
+    } catch (err) { handleError(err); }
+  });
+  if (saved) renderSettings();
+};
+
+/* ── trainer roster ─────────────────────────────────────────────── */
+const rState = { filt: 'all', q: '', page: 0 };
+function rosterFiltered() {
+  let rows = visibleMembers().slice();
+  if (rState.filt === 'active') rows = rows.filter(memberIsActive);
+  if (rState.filt === 'lapsed') rows = rows.filter(m => !memberIsActive(m));
+  if (rState.filt === 'soon') rows = rows.filter(m => { const d = dayDiff(m.current_period_end, TODAY); return d >= 0 && d <= 14; });
+  const q = rState.q.trim().toLowerCase();
+  if (q) rows = rows.filter(m => (m.first_name + ' ' + m.last_name + ' ' + m.goal).toLowerCase().includes(q));
+  return rows.sort((a, b) => dnum(a.current_period_end) - dnum(b.current_period_end));
+}
+function renderRoster() {
+  const mine = visibleMembers();
+  const t = trainerOf(session.me.trainer_id);
+  $('#rosterTitle').textContent = 'My roster';
+  const soon = mine.filter(m => { const d = dayDiff(m.current_period_end, TODAY); return d >= 0 && d <= 14; }).length;
+  $('#trainerKpis').innerHTML = [
+    { lab: 'Assigned to me', icon: 'users', num: mine.length, foot: (t ? t.specialization : '') },
+    { lab: 'Active', icon: 'check', num: mine.filter(memberIsActive).length, foot: mine.filter(m => !memberIsActive(m)).length + ' lapsed and off the floor' },
+    { lab: 'Renewing in 14 days', icon: 'clock', num: soon, foot: 'Worth a nudge at the next session' }
+  ].map(k => '<div class="card kpi"><p class="k-lab">' + svg(k.icon, 15) + esc(k.lab) + '</p>' +
+    '<p class="k-num">' + k.num + '</p><p class="k-foot">' + esc(k.foot) + '</p></div>').join('');
+  filtBar($('#rosterFilters'), [
+    { k: 'all', label: 'All', n: mine.length },
+    { k: 'active', label: 'Active', n: mine.filter(memberIsActive).length },
+    { k: 'lapsed', label: 'Lapsed', n: mine.filter(m => !memberIsActive(m)).length },
+    { k: 'soon', label: 'Renewing soon', n: soon }
+  ], rState.filt, k => { rState.filt = k; rState.page = 0; renderRoster(); });
+  const s = $('#rosterSearch');
+  if (s.value !== rState.q) s.value = rState.q;
+  s.oninput = () => { rState.q = s.value; rState.page = 0; paintRosterRows(); };
+  paintRosterRows();
+}
+function paintRosterRows() {
+  const rows = rosterFiltered();
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  if (rState.page > pages - 1) rState.page = pages - 1;
+  const slice = rows.slice(rState.page * PAGE, rState.page * PAGE + PAGE);
+  $('#rosterRows').innerHTML = slice.length ? slice.map(m => {
+    const days = dayDiff(m.current_period_end, TODAY);
+    return '<tr><td><button class="rowbtn" data-m="' + m.id + '">' + nameCell(m) + '</button></td>' +
+      '<td>' + esc(planOf(m.plan).name) + '</td>' +
+      '<td class="dim">' + esc(m.goal) + '</td>' +
+      '<td>' + memberStatusChip(m) + '</td>' +
+      '<td class="num">' + fmtShort(m.current_period_end) +
+      '<span class="dim" style="margin-left:8px">' + (days >= 0 ? 'in ' + days + 'd' : Math.abs(days) + 'd ago') + '</span></td>' +
+      '<td class="act"><button class="btn btn-ghost btn-sm" data-m="' + m.id + '">Open</button></td></tr>';
+  }).join('') : emptyRow(6, 'Nobody in this view', 'The API only returns members assigned to you.');
+  $$('#rosterRows [data-m]').forEach(b => b.onclick = () => openMemberDrawer(+b.dataset.m));
+  pager($('#rosterPager'), rows.length, rState.page, p => { rState.page = p; paintRosterRows(); });
+}
+
+/* ── member overview ────────────────────────────────────────────── */
+function renderMemberHome() {
+  const me = session.me, m = memberOf(me.member_profile_id);
+  const p = planOf(m.plan), t = trainerOf(m.trainer);
+  const days = dayDiff(m.current_period_end, TODAY);
+  const open = myInvoices().filter(v => v.status === 'open');
+  const due = open.reduce((s, v) => s + v.total_amount, 0);
+  $('#homeHi').textContent = 'Hello, ' + me.first_name;
+  $('#memberKpis').innerHTML = [
+    { lab: 'Membership', icon: 'user', num: memberIsActive(m) ? 'Active' : 'Lapsed',
+      foot: 'Derived from current_period_end, not a stored flag' },
+    { lab: days >= 0 ? 'Days remaining' : 'Days lapsed', icon: 'clock', num: Math.abs(days),
+      foot: 'Period ' + (days >= 0 ? 'ends ' : 'ended ') + fmtDate(m.current_period_end) },
+    { lab: 'Outstanding', icon: 'receipt', num: inr(due),
+      foot: open.length + ' open invoice' + (open.length === 1 ? '' : 's') }
+  ].map(k => '<div class="card kpi"><p class="k-lab">' + svg(k.icon, 15) + esc(k.lab) + '</p>' +
+    '<p class="k-num">' + esc(String(k.num)) + '</p><p class="k-foot">' + esc(k.foot) + '</p></div>').join('');
+  $('#memberRecord').innerHTML =
+    '<dt>Status</dt><dd>' + memberStatusChip(m) + '</dd>' +
+    '<dt>Plan</dt><dd>' + esc(p.name) + ' · ' + inr(p.price) + ' / ' + p.duration_days + ' days</dd>' +
+    '<dt>Includes</dt><dd>' + ([p.includes_trainer ? 'Trainer' : null, p.includes_diet ? 'Diet plan' : null].filter(Boolean).join(' · ') || '<span class="dim">Floor access only</span>') + '</dd>' +
+    '<dt>Trainer</dt><dd>' + (t ? esc(t.first_name + ' ' + t.last_name) + ' <span class="dim">· ' + esc(t.specialization) + '</span>' : '<span class="dim">Unassigned</span>') + '</dd>' +
+    '<dt>Goal</dt><dd>' + esc(m.goal) + '</dd>' +
+    '<dt>Member since</dt><dd class="mono t-cap">' + fmtDate(m.join_date) + '</dd>' +
+    '<dt>Period ends</dt><dd class="mono t-cap">' + fmtDate(m.current_period_end) + '</dd>' +
+    '<dt>Gym</dt><dd>' + esc(db.gym.name) + '</dd>';
+  const next = open.sort((a, b) => dnum(a.due_date) - dnum(b.due_date))[0];
+  $('#memberDue').innerHTML = next
+    ? '<p class="t-over">Oldest open invoice</p>' +
+      '<p class="t-h3" style="margin-top:8px">' + inr2(next.total_amount) + '</p>' +
+      '<p class="t-cap mono" style="margin-top:4px">' + esc(next.number) + '</p>' +
+      '<div class="row g8 wrapz" style="margin-top:12px">' + invStatusChip(next) +
+      '<span class="chip">due ' + fmtShort(next.due_date) + '</span></div>' +
+      '<button class="btn btn-primary btn-block" style="margin-top:16px" id="mhPay">Pay ' + inr(next.total_amount) + '</button>' +
+      '<button class="btn btn-ghost btn-block btn-sm" style="margin-top:8px" data-nav="myinvoices">See all invoices</button>'
+    : '<p class="t-sm">Nothing outstanding. ' + (memberIsActive(m) ? 'Your membership runs to ' + fmtDate(m.current_period_end) + '.' : 'Ask the front desk to raise a renewal invoice.') + '</p>';
+  if (next) $('#mhPay').onclick = () => openPayFlow(next.id);
+}
+
+function renderMyInvoices() {
+  const rows = myInvoices();
+  $('#myInvoiceRows').innerHTML = rows.length ? rows.map(v =>
+    '<tr><td><button class="rowbtn" data-v="' + v.id + '"><span class="col" style="gap:2px">' +
+    '<span class="nm mono">' + esc(v.number) + '</span>' +
+    '<span class="em">' + esc(v.label) + '</span></span></button></td>' +
+    '<td class="dim mono t-cap">' + fmtShort(v.issue_date) + '</td>' +
+    '<td class="dim mono t-cap">' + fmtShort(v.due_date) + '</td>' +
+    '<td class="num" style="font-weight:500">' + inr2(v.total_amount) + '</td>' +
+    '<td>' + invStatusChip(v) + '</td>' +
+    '<td class="act">' + (v.status === 'open'
+      ? '<button class="btn btn-secondary btn-sm" data-pay="' + v.id + '">Pay</button>'
+      : '<button class="btn btn-ghost btn-sm" data-v="' + v.id + '">Open</button>') + '</td></tr>').join('')
+    : emptyRow(6, 'No invoices yet', 'Invoices appear here as soon as the desk raises one.');
+  $$('#myInvoiceRows [data-v]').forEach(b => b.onclick = () => openInvoiceDrawer(+b.dataset.v));
+  $$('#myInvoiceRows [data-pay]').forEach(b => b.onclick = () => openPayFlow(+b.dataset.pay));
+}
+
+/* ── my account ─────────────────────────────────────────────────── */
+const meSnapshot = () => ({ first_name: session.me.first_name, last_name: session.me.last_name, phone: session.me.phone || '' });
+const meFormValues = () => ({ first_name: $('#meFirst').value.trim(), last_name: $('#meLast').value.trim(), phone: $('#mePhone').value.trim() });
+function fillMeForm() {
+  const me = session.me;
+  $('#meAv').textContent = initials(me.first_name, me.last_name);
+  $('#meName').textContent = me.first_name + ' ' + me.last_name;
+  $('#meMail').textContent = me.email;
+  $('#meFirst').value = me.first_name; $('#meLast').value = me.last_name;
+  $('#mePhone').value = me.phone || ''; $('#meRole').value = me.role;
+  meDirtyCheck();
+}
+function meDirtyCheck() {
+  const a = meSnapshot(), b = meFormValues();
+  const keys = Object.keys(a).filter(k => a[k] !== b[k]);
+  $('#meDirty').textContent = keys.length ? keys.length + ' unsaved change' + (keys.length === 1 ? '' : 's') : 'No unsaved changes.';
+  $('#meSave').disabled = keys.length === 0; $('#meReset').disabled = keys.length === 0;
+  return keys;
+}
+function renderAccount() {
+  fillMeForm();
+  const me = session.me;
+  $('#sessionFacts').innerHTML =
+    '<dt>Access token</dt><dd class="mono t-cap">' + esc(session.access.slice(0, 18)) + '…</dd>' +
+    '<dt>Refresh token</dt><dd class="mono t-cap">' + esc(session.refresh.slice(0, 18)) + '… ' +
+    '<button class="linky" type="button" id="rotBtn" style="border:0;background:none;padding:0;font:inherit">Rotate</button></dd>' +
+    '<dt>Rotations</dt><dd class="mono t-cap">' + session.refreshes + '</dd>' +
+    '<dt>Signed in</dt><dd class="mono t-cap">' + new Date(session.issued).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) + '</dd>' +
+    '<dt>Gym</dt><dd>' + esc(me.gym) + '</dd>';
+  $('#rotBtn').onclick = () => { rotate(); renderAccount(); toast('ok', 'Refresh token rotated.', null, 'The previous token is blacklisted — reusing it returns TOKEN_CONSUMED.'); };
+  $('#verifyCard').innerHTML = me.email_verified
+    ? '<p class="t-over">Email</p><div class="row g8"><span class="chip chip-ok chip-dot">verified</span></div>' +
+      '<p class="t-cap">' + esc(me.email) + ' is confirmed, so password resets and invoice mail will reach you.</p>'
+    : '<p class="t-over">Email</p><div class="row g8"><span class="chip chip-warn chip-dot">unverified</span></div>' +
+      '<p class="t-cap">' + esc(me.email) + ' has not been confirmed. Verification runs off the token in the mail we sent — <span class="mono">POST /api/auth/verify-email</span> — and phase 1 has no resend route. Sending yourself a reset link puts a fresh signed mail in the inbox.</p>' +
+      '<button class="btn btn-secondary btn-sm" id="verBtn">Email me a reset link</button>';
+  if (!me.email_verified) $('#verBtn').onclick = async () => {
+    await withBusy($('#verBtn'), 'Sending…', async () => {
+      try {
+        await request('POST', '/api/auth/password-reset', { email: me.email });
+        toast('ok', 'Reset link sent to ' + me.email + '.', null, 'The endpoint always answers 202, so it never leaks whether an address is registered.');
+      } catch (err) { handleError(err); }
+    });
+  };
+}
+$$('#meForm input').forEach(el => el.oninput = meDirtyCheck);
+$('#meReset').onclick = () => { fillMeForm(); };
+$('#meForm').onsubmit = async e => {
+  e.preventDefault();
+  const ok = validate([
+    { f: 'fMeFirst', i: 'meFirst', test: notEmpty }, { f: 'fMeLast', i: 'meLast', test: notEmpty },
+    { f: 'fMePhone', i: 'mePhone', test: v => v.length === 0 || v.length >= 8 }
+  ]);
+  if (!ok) return;
+  const body = meFormValues();
+  let saved = false;
+  await withBusy($('#meSave'), 'Saving…', async () => {
+    try {
+      await request('PATCH', '/api/me', body);
+      Object.assign(session.me, body);
+      const ident = IDENTITIES.find(i => i.key === session.identity);
+      Object.assign(ident.user, body);
+      if (session.me.member_profile_id) Object.assign(memberOf(session.me.member_profile_id), { first_name: body.first_name, last_name: body.last_name, phone: body.phone });
+      $('#userAv').textContent = initials(body.first_name, body.last_name);
+      $('#userName').textContent = body.first_name + ' ' + body.last_name;
+      $('#menuName').textContent = body.first_name + ' ' + body.last_name;
+      saved = true;
+      toast('ok', 'Profile saved.', null);
+    } catch (err) { handleError(err); }
+  });
+  if (saved) renderAccount();
+};
+
+/* ── screen registry + primary CTAs ─────────────────────────────── */
+const SCREENS = {
+  dashboard: renderDashboard,
+  members: renderMembers,
+  trainers: renderTrainers,
+  plans: renderPlans,
+  billing: renderBilling,
+  settings: renderSettings,
+  roster: renderRoster,
+  home: renderMemberHome,
+  myinvoices: renderMyInvoices,
+  account: renderAccount
+};
+$('#addMemberBtn').onclick = openAddMember;
+$('#addTrainerBtn').onclick = openAddTrainer;
+$('#addPlanBtn').onclick = () => openPlanDialog(null);
+
+/* ── boot ───────────────────────────────────────────────────────── */
+(function boot() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SKEY) || 'null'); } catch (e) { saved = null; }
+  const ident = saved && IDENTITIES.find(i => i.key === saved.identity);
+  if (ident) { session = { access: newToken('acc'), refresh: newToken('ref'), identity: ident.key, me: buildMe(ident), issued: Date.now(), refreshes: 1 }; enterApp(); }
+  else { showPane('login'); }
+})();
+</script>
+</body>
 </html>
