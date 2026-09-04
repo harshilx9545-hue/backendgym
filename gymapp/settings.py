@@ -221,6 +221,34 @@ SAAS_TRIAL_DAYS = config.env_int("SAAS_TRIAL_DAYS", 14)
 SAAS_INVOICE_LEAD_DAYS = config.env_int("SAAS_INVOICE_LEAD_DAYS", 7)
 
 
+# ============ AI REVENUE RECOVERY ============
+
+# None of these widen what the recovery agent is permitted to do. The agent treats the
+# language model as an untrusted planner and re-checks every money and tenancy decision
+# in Python afterwards, so these settings only decide *which planner is asked*.
+#
+# Absent RECOVERY_LLM_CLIENT means the offline deterministic planner. That is why
+# `run_recovery_batch --synthetic-data` runs with no API key and opens no socket, and it
+# is also the fallback when a hosted model errors: a dunning batch that stops because an
+# inference endpoint is down is worse than one that sends the obvious reminder.
+#
+# To use a hosted model instead:
+#   pip install openai
+#   RECOVERY_LLM_CLIENT=core.services.recovery_agent.OpenAIToolCallingClient
+#   OPENAI_API_KEY=sk-...
+RECOVERY_LLM_CLIENT = config.env_str("RECOVERY_LLM_CLIENT")
+RECOVERY_LLM_MODEL = config.env_str("RECOVERY_LLM_MODEL", "gpt-4o-mini")
+OPENAI_API_KEY = config.env_str("OPENAI_API_KEY", "")
+
+# Where a recovery payment link points. The Razorpay adapter here exposes *orders*
+# rather than hosted Payment Links, so the link addresses the platform's own checkout
+# page, which opens Razorpay Checkout with the order reference and the public key. No
+# secret is ever part of a link.
+RECOVERY_CHECKOUT_BASE_URL = config.env_str(
+    "RECOVERY_CHECKOUT_BASE_URL", "https://pay.gymapp.example/checkout"
+)
+
+
 # ============ EMAIL ============
 
 vars().update(config.email_config(DEBUG))
