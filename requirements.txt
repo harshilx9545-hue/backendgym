@@ -1,3 +1,10 @@
+# Runtime dependencies. Only what the application actually imports.
+#
+# Kept deliberately small because this is also the install list for the serverless
+# deployment, where the unzipped bundle has a hard size limit. Test tooling lives in
+# requirements-dev.txt; shipping pytest and hypothesis to production wasted most of
+# that budget and put a test framework on a live host for no reason.
+
 # Core
 # Range rather than an exact pin: the code is verified against 5.2.x and the
 # declared range now agrees with the targeted major version (6.13).
@@ -5,9 +12,6 @@ Django>=5.2,<6.0
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
 django-cors-headers==4.4.0
-# Declared for parity with the spec's dependency set. Environment reading itself
-# is done by gymapp/config.py, which owns the startup validation contract.
-django-environ==0.11.2
 
 # Payments
 razorpay==1.4.2
@@ -15,20 +19,20 @@ razorpay==1.4.2
 # Database (PostgreSQL in production; SQLite needs nothing extra)
 psycopg[binary]==3.2.3
 
-# Deferred phases - kept from the original plan, not yet wired
-django-htmx
-cloudinary
-django-cloudinary-storage
-celery
-redis
-twilio
-
-# Tests
-pytest==8.3.3
-pytest-django==4.9.0
-# Needed by the concurrency properties (20, 32), which fan out across processes.
-pytest-xdist==3.6.1
-# The [django] extra supplies from_model()/register_field_strategy for the
-# model-backed strategies in core/tests/strategies.py.
-hypothesis[django]==6.112.1
-freezegun==1.5.1
+# ---------------------------------------------------------------------------
+# Deliberately NOT declared here:
+#
+#   openai          - the hosted recovery planner imports it lazily and normalises
+#                     ImportError to LLMUnavailable, so the agent falls back to its
+#                     deterministic planner. Install it only to run --live inference:
+#                         pip install "openai==1.51.0"
+#
+#   django-environ  - gymapp/config.py owns environment reading and startup
+#                     validation by hand; nothing imports environ.
+#
+#   celery, redis, twilio, cloudinary, django-cloudinary-storage, django-htmx
+#                   - planned for later phases. Nothing imports them yet, and
+#                     declaring an unused dependency is a supply-chain surface and
+#                     bundle weight for no benefit. Add them when the code that
+#                     needs them lands.
+# ---------------------------------------------------------------------------

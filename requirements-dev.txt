@@ -1,0 +1,17 @@
+# Development and test dependencies.
+#
+#   pip install -r requirements.txt -r requirements-dev.txt
+#
+# Separate from requirements.txt so the serverless deployment does not install a test
+# framework, and so the deployed bundle stays inside its size limit.
+
+-r requirements.txt
+
+pytest==8.3.3
+pytest-django==4.9.0
+# Needed by the concurrency properties (20, 32), which fan out across processes.
+pytest-xdist==3.6.1
+# The [django] extra supplies from_model()/register_field_strategy for the
+# model-backed strategies in core/tests/strategies.py.
+hypothesis[django]==6.112.1
+freezegun==1.5.1

@@ -15,3 +15,8 @@ media/
 # Tests
 .pytest_cache/
 .hypothesis/
+
+# Local run captures (demo output, test logs)
+demo_output.txt
+test_*.txt
+_*.txt

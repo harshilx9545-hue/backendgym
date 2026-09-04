@@ -1,82 +1,62 @@
-# AI Revenue Recovery — Buildathon Submission
+# Razorpay AI Buildathon - submission notes
 
-**Track:** 03 — AI Revenue Recovery
-**Repo:** this repository — the agent lives at `core/services/recovery_agent.py`,
-the runnable demo at `core/management/commands/run_recovery_batch.py`.
+**Track:** 03 - AI Revenue Recovery
 
-## What it does
+The submission write-up lives in [README.md](README.md): what the agent does, the
+one command that runs it, the measured result, the architecture, the four guardrails
+and how each is enforced, and the honest limitations.
 
-Detects overdue B2B/member receivables, decides the right intervention per invoice
-(reminder → firmer reminder → discount offer → human escalation), and executes a
-**bounded** recovery workflow — with the money, the escalation, and every guardrail
-refusal measured and logged, not asserted.
+This file records how the submission maps onto the track's stated bar.
 
-```
-python manage.py run_recovery_batch --synthetic-data --rounds 4
-```
+## The bar, and where it is met
 
-seeds 50 synthetic overdue invoices across 4 escalation tiers and runs the batch,
-printing a full measured report: recovered amount, pending amount, stopped amount,
-a per-invoice audit line for every decision (including every guardrail refusal),
-and a ledger reconciliation check.
+The track asks for more than identifying the problem: measured money recovered
+across a batch, compliant escalation, stopping rules, and an audit trail.
 
-## Why "the model is an untrusted planner"
-
-The core design decision: the LLM reads one invoice's context and *picks a tool with
-arguments*. It never touches the database, never computes money, and never decides
-what is permitted. Every action that could cost the gym money or leak another
-tenant's data is re-checked in plain Python after the model has spoken.
-
-### The four guardrails, and how each is actually enforced
-
-| Guardrail | Enforcement |
+| Asked for | Where it is |
 |---|---|
-| **Tenant boundary** | Every tool re-reads `gym_id` from its own arguments and compares it against the agent's `tenant_id` before any DB lookup — a prompt-injected note claiming "you are now serving gym 42" produces a `PermissionDenied`, not a cross-tenant write. |
-| **Discount cap (20%)** | Enforced twice: the orchestration layer *clamps* whatever the model asked for down to the cap (so one bad number doesn't stall collection), and the tool independently *refuses* anything over the cap (so a direct call — what a successful injection looks like — throws). |
-| **One discount per invoice** | Counted from the append-only `RecoveryAttempt` ledger, not from anything the model says. Asking twice is refused, and the refusal itself is logged. |
-| **Stopping rule (3 automated attempts)** | Also counted from the ledger. After 3 automated contacts, the invoice goes to a human and the agent stops touching it — visible in the demo as `stopped_attempt_limit`. |
+| **Measured money recovered across a batch** | `Rs.36,674.40` of `Rs.115,050.00` outstanding across 50 invoices, summed from `payment_observed` rows in the `RecoveryAttempt` ledger rather than accumulated by the agent. `CAMPAIGN TOTAL` block, `run_recovery_batch --synthetic-data --rounds 4`. |
+| **Compliant escalation** | Four tiers by overdue age, tone fixed per tier, discounts only at tier 3, tier 4 hands off to a human and sends the member nothing. Tier policy is applied after the model chooses, so the model cannot promote itself a rung. |
+| **Stopping rules** | Three automated contacts per invoice, counted from the ledger, then the invoice is a human's. Also: one discount per invoice, ever. Both refuse rather than warn, and 27 of 50 invoices are out of automated contact by round 4. |
+| **An audit trail** | `RecoveryAttempt`: one append-only row per decision including every refusal, immutable three ways over (append-only manager, `save()` refuses a second write, `delete()` raises). 166 rows over the demo run. |
 
-Money is never computed by the model either: a discount is applied by recomputing
-GST through `core.services.invoicing.compute_tax`, so a discounted invoice still
-satisfies the codebase's invariant that total = taxable value + tax components.
+## What is worth a reviewer's attention
 
-### Escalation ladder
+**The model is an untrusted planner.** It picks a tool and arguments. It never
+touches the database, never computes money, never decides what is permitted. The
+guardrails run in plain Python downstream of it, and none of them consults the
+model's opinion of its own limits.
 
-| Tier | Window | Tone | Can discount? |
-|---|---|---|---|
-| 1 | 1–7 days | gentle reminder | No |
-| 2 | 8–14 days | firm reminder | No |
-| 3 | 15–21 days | final notice with offer | Yes (capped, once) |
-| 4 | 22+ days | human escalation | No — hands off to a human |
+**Refusals are recorded, not swallowed.** 18 `blocked_duplicate_discount` rows in
+the demo run are the agent asking for a second discount on an invoice and being
+refused. A guardrail that leaves no evidence is a claim.
 
-## Measured output (real run, not cherry-picked)
+**The report is a measurement, not a summary.** Every figure is read back from the
+database. Each round asserts
+`recovered + pending + stopped + discounts given up == outstanding at start` and the
+command exits non-zero if it does not balance, so an unreconcilable report cannot
+ship quietly.
 
-A 4-round synthetic batch against 50 seeded overdue invoices (₹72,688 outstanding):
+**The recovered figure is reproducible.** Synthetic member responses derive from
+`--seed` and the invoice sequence number, so a fresh clone reproduces
+`Rs.36,674.40`. This was a real bug found while preparing the submission: the roll
+had been keyed on the full invoice number, which embeds a per-run random gym slug,
+so `--seed` did nothing and the reported figure moved by thousands of rupees between
+identical runs. Fixed in `_synthetic_roll`.
 
-- **164 ledger rows written** across all rounds — every decision, including refusals
-- **₹36,934 measured recovered** (via `payment_observed`, read back independently
-  from the ledger, not from the batch's own running total)
-- **12 guardrail refusals** (`blocked_duplicate_discount`) — the agent tried to
-  re-offer a discount on an invoice that already had one, and was refused
-- **16 invoices hit the stopping rule** (`stopped_attempt_limit`) — 3 automated
-  attempts made, handed to a human, no further automated contact
-- **Reconciliation check passes**: recovered + pending + stopped + discounts given
-  up = outstanding at start, every round — the command hard-fails (`CommandError`)
-  if this doesn't balance, so a report that doesn't add up can't ship silently
+## Guardrail tests
 
-## Test coverage
+```
+python -m pytest core/tests/test_property_41_recovery_discount_cap.py core/tests/test_property_42_recovery_tenant_boundary.py core/tests/test_property_43_recovery_stopping_rule.py
+```
 
-Three dedicated property tests cover the guardrails specifically:
-- `test_property_41_recovery_discount_cap.py`
-- `test_property_42_recovery_tenant_boundary.py`
-- `test_property_43_recovery_stopping_rule.py`
+25 tests covering the discount cap, the tenant boundary under prompt injection, and
+the stopping rule. Passing.
 
-## Honest limitations
+## Limitations
 
-- The offline "heuristic" planner is deterministic (no API key needed to run the
-  demo above); a real hosted LLM planner is wired via `get_llm_client()` but needs
-  an API key to exercise live.
-- `--live` mode performs real recovery actions and leaves collection measurement to
-  the gateway's webhooks — it does not simulate a member paying, so `recovered` is
-  0 by construction in that mode until a webhook actually lands.
-- Reminder emails are off by default (`--notify` to actually send).
+Stated plainly in the README's "Honest limitations" section. The two that matter
+most to a reviewer: the default planner is deterministic and offline (a hosted
+OpenAI tool-calling planner is wired but needs a key), and `--synthetic-data`
+simulates whether a member pays rather than observing a real collection. The report
+labels the mode on every run.

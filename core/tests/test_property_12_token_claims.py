@@ -11,6 +11,19 @@ from core.tests import factories
 pytestmark = pytest.mark.django_db
 
 
+def names_user(decoded, user):
+    """Whether the token's user claim identifies this user.
+
+    Compared on `str()` of both sides rather than by equality on the raw claim.
+    simplejwt serialises the user-id claim as an integer up to 5.3 and as a string
+    from 5.4 onwards, and the property under test is that the token *names this
+    user* - not which JSON scalar type the library happened to choose. The lookup
+    path agrees: `auth_tokens.refresh_tokens` passes the claim straight to
+    `filter(pk=...)`, which coerces either form.
+    """
+    return str(decoded["user_id"]) == str(user.pk)
+
+
 # Feature: gym-saas-core, Property 12: For any User identifier, role, and Gym
 # identifier, decoding the access token issued for those values yields exactly those
 # three values.
@@ -29,7 +42,7 @@ def test_access_token_claims_round_trip(role):
     tokens = issue_tokens(user)
     decoded = AccessToken(tokens["access"])
 
-    assert decoded["user_id"] == user.pk
+    assert names_user(decoded, user)
     assert decoded["role"] == role
     assert decoded["gym_id"] == gym.pk
 
@@ -49,7 +62,7 @@ def test_refresh_token_carries_the_same_claims(role):
     tokens = issue_tokens(profile.user)
     decoded = RefreshToken(tokens["refresh"])
 
-    assert decoded["user_id"] == profile.user.pk
+    assert names_user(decoded, profile.user)
     assert decoded["role"] == role
     assert decoded["gym_id"] == gym.pk
 
@@ -60,4 +73,4 @@ def test_staff_account_token_carries_a_null_gym():
     decoded = AccessToken(issue_tokens(staff)["access"])
 
     assert decoded["gym_id"] is None
-    assert decoded["user_id"] == staff.pk
+    assert names_user(decoded, staff)

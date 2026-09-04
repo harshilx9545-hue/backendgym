@@ -52,10 +52,13 @@ def test_login_succeeds_for_either_identifier(kind, phone, api_client):
     assert body["access"] and body["refresh"]
 
     # Both tokens verify against the signing key, and name exactly this user.
+    # Compared on `str()` of both sides: simplejwt serialises the user-id claim as an
+    # integer up to 5.3 and as a string from 5.4 on, and what this property asserts is
+    # that the token names this user, not which JSON scalar type the library picked.
     access = AccessToken(body["access"])
     refresh = RefreshToken(body["refresh"])
-    assert access["user_id"] == user.pk
-    assert refresh["user_id"] == user.pk
+    assert str(access["user_id"]) == str(user.pk)
+    assert str(refresh["user_id"]) == str(user.pk)
 
 
 @hyp_settings(max_examples=100)

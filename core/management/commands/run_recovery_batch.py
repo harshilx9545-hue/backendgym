@@ -13,6 +13,12 @@ every decision including the ones the guardrails refused.
 becomes visible: the same invoice is contacted at most three times, and from the fourth
 round on it reports `stopped_attempt_limit` instead of a fourth reminder.
 
+A multi-round run leads with `CAMPAIGN TOTAL`, the money recovered across every round,
+read back from the ledger. The per-round report that follows is the *last* round's, and
+on a four-round run that round recovers nothing by construction - the members who were
+going to respond already have, and the rest are stopped - so printing only it would
+understate the campaign to zero.
+
 The formatting helpers are module-level and importable, so the conformance tests can
 assert on the report text without capturing stdout.
 """
@@ -63,15 +69,18 @@ def money(amount, symbol="\u20b9"):
     return f"{symbol}{Decimal(amount):,.2f}"
 
 
-def format_header(report, symbol="\u20b9"):
+def format_header(report, symbol="\u20b9", round_label=""):
     mode = (
         "synthetic (member responses simulated)"
         if report.synthetic
         else "live (collection left to gateway webhooks)"
     )
+    title = "AI REVENUE RECOVERY - BATCH REPORT"
+    if round_label:
+        title = f"{title} ({round_label})"
     return [
         "=" * 100,
-        "AI REVENUE RECOVERY - BATCH REPORT",
+        title,
         "=" * 100,
         f"Gym                  : {report.gym_slug} (id {report.gym_id})",
         f"Mode                 : {mode}",
@@ -160,14 +169,63 @@ def format_audit_log(report, symbol="\u20b9", with_reasoning=False):
     return lines
 
 
+def ledger_recovered(gym_id):
+    """Money collected for this gym, summed from the ledger's `payment_observed` rows.
+
+    The single authoritative recovered figure. Deliberately a read-back rather than a
+    running total the batch keeps for itself: an agent that reported its own takings
+    would be measuring its own prompt.
+    """
+    rows = RecoveryAttempt.objects.filter(gym_id=gym_id, outcome=Outcome.PAYMENT_OBSERVED)
+    return sum((row.amount_recovered for row in rows), Decimal("0.00"))
+
+
+def format_campaign_summary(reports, symbol="\u20b9"):
+    """Cumulative result across every round, for multi-round runs.
+
+    A per-round report is a snapshot, and the last snapshot of a `--rounds 4` run is
+    necessarily the quiet one: by round 4 the money has already been collected and the
+    survivors are all stopped, so that round alone reads `0 recovered`. Printing only
+    it would understate the campaign to zero. The campaign figure is what the track
+    actually asks for - money recovered across a batch - so it is read back from the
+    ledger and printed first.
+    """
+    first, last = reports[0], reports[-1]
+    gym_id = first.gym_id
+    recovered = ledger_recovered(gym_id)
+    opening = first.outstanding_before
+    rate = (recovered / opening).quantize(Decimal("0.0001")) if opening > 0 else Decimal("0.0000")
+
+    lines = [
+        "=" * 100,
+        f"CAMPAIGN TOTAL ACROSS {len(reports)} ROUND(S) - measured from the append-only ledger",
+        "=" * 100,
+        f"  outstanding at start      : {money(opening, symbol)}  ({first.processed} overdue invoices)",
+        f"  MONEY RECOVERED           : {money(recovered, symbol)}",
+        f"  recovery rate             : {rate}",
+        f"  still pending at the end  : {money(last.pending_amount, symbol)}  "
+        f"({last.pending_count} invoice(s))",
+        f"  stopped by a guardrail    : {money(last.stopped_amount, symbol)}  "
+        f"({last.stopped_count} invoice(s), no further automated contact)",
+        "",
+        "  Per round:",
+    ]
+    for index, report in enumerate(reports, start=1):
+        lines.append(
+            f"    round {index}: {report.recovered_count:>3} recovered "
+            f"{money(report.recovered_amount, symbol):>14}   "
+            f"{report.pending_count:>3} pending   {report.stopped_count:>3} stopped   "
+            f"reconciles={report.reconciles}"
+        )
+    lines.append("")
+    return lines
+
+
 def format_ledger_totals(gym_id, symbol="\u20b9"):
     """Read the whole ledger back for this gym, independently of any one batch."""
     rows = RecoveryAttempt.objects.filter(gym_id=gym_id)
     total = rows.count()
-    recovered = sum(
-        (row.amount_recovered for row in rows.filter(outcome=Outcome.PAYMENT_OBSERVED)),
-        Decimal("0.00"),
-    )
+    recovered = ledger_recovered(gym_id)
     lines = [
         "",
         "-" * 100,
@@ -184,10 +242,10 @@ def format_ledger_totals(gym_id, symbol="\u20b9"):
     return lines
 
 
-def format_report(report, *, symbol="\u20b9", with_reasoning=False, ledger=True):
+def format_report(report, *, symbol="\u20b9", with_reasoning=False, ledger=True, round_label=""):
     """The whole report as a list of lines."""
     lines = []
-    lines += format_header(report, symbol)
+    lines += format_header(report, symbol, round_label=round_label)
     lines += format_result(report, symbol)
     lines += format_actions(report, symbol)
     lines += format_tiers(report)
@@ -314,6 +372,7 @@ class Command(BaseCommand):
 
         synthetic_run = not options["live"]
         report = None
+        reports = []
         # A synthetic run gets the offline gateway, so the tier-3 discount path is
         # actually exercised rather than failing on an absent API key. A live run gets
         # `None` and the agent resolves the configured adapter as normal.
@@ -327,6 +386,7 @@ class Command(BaseCommand):
                 adapter=adapter,
             )
             report = agent.run_recovery_batch(gym.pk, synthetic=synthetic_run)
+            reports.append(report)
 
             if rounds > 1:
                 self.stdout.write(
@@ -348,11 +408,27 @@ class Command(BaseCommand):
                     f"{report.outstanding_before} was outstanding at the start."
                 )
 
+        # Multi-round runs lead with the campaign total. The final round's own report
+        # follows, labelled, because on a `--rounds 4` run that round is the one where
+        # the stopping rule has taken over and it recovers nothing by construction.
+        round_label = ""
+        if len(reports) > 1:
+            for line in format_campaign_summary(reports, symbol):
+                self.stdout.write(line)
+            round_label = f"final round, {len(reports)} of {len(reports)}"
+
         for line in format_report(
-            report, symbol=symbol, with_reasoning=options["reasoning"]
+            report,
+            symbol=symbol,
+            with_reasoning=options["reasoning"],
+            round_label=round_label,
         ):
             self.stdout.write(line)
 
+        recovered = ledger_recovered(gym.pk)
         self.stdout.write(
-            self.style.SUCCESS(f"Recovery batch complete: {report.summary_line(symbol)}")
+            self.style.SUCCESS(
+                f"Recovery batch complete over {len(reports)} round(s): "
+                f"{money(recovered, symbol)} recovered, measured from the ledger."
+            )
         )

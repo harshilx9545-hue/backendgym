@@ -1707,9 +1707,18 @@ class AIRevenueRecoveryAgent:
         Derived from the seed and the invoice number rather than from `random`, so a
         report is reproducible: the same seed and the same data give the same recovered
         figure, which is what makes the measurement worth quoting.
+
+        Keyed on the invoice's *sequence number within its financial year*, not on
+        `invoice.number`. The full number embeds the gym slug, and
+        `seed_synthetic_overdue_invoices` gives each run a fresh gym with a random slug
+        suffix so repeated demos cannot collide. Hashing that slug made every run roll
+        differently and quietly defeated `--seed`: the reported recovered figure moved
+        by thousands of rupees between two runs of the same command, which is exactly
+        the kind of number that should not appear in a report. The sequence number is
+        stable across runs and still distinct per invoice.
         """
         digest = hashlib.sha256(
-            f"{self.seed}:{invoice.number}".encode("utf-8")
+            f"{self.seed}:{invoice.financial_year}:{invoice.sequence_no}".encode("utf-8")
         ).digest()
         return int.from_bytes(digest[:4], "big") / float(1 << 32)
 
