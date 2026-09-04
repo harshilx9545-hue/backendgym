@@ -186,7 +186,19 @@ python -m pytest core/tests/test_property_41_recovery_discount_cap.py core/tests
 
 Three property-based suites cover the guardrails specifically: the discount cap, the
 tenant boundary under prompt injection, and the stopping rule. 25 tests, and they
-pass. `python -m pytest` runs the whole platform suite.
+pass.
+
+`python -m pytest` runs the whole platform suite: **348 passed, 3 skipped, 4
+deselected**. The 3 skips are concurrency clauses that only mean something on
+PostgreSQL - SQLite takes a database-level lock rather than a row-level one, so
+`select_for_update()` cannot be shown to do anything there and a passing test would
+prove nothing. The 4 deselected are the Razorpay sandbox tests, the only ones that
+open a socket, excluded by `pytest.ini` and opt-in via `pytest -m integration`. They
+skip rather than fake it when credentials are absent.
+
+Test docstrings cite requirement and property numbers (`Validates: Requirements
+13.7, 13.2`). Those resolve to `.kiro/specs/gym-saas-core/requirements.md` and
+`design.md`, which is where the 40 correctness properties are stated.
 
 ## Why the agent lives inside a full gym billing platform
 

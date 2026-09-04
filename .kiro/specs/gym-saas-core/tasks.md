@@ -85,19 +85,7 @@ DATABASE_URL=postgres://user:pw@localhost:5432/gymapp pytest -q
 | `core/views/profiles.py` | Trainer and member lists paginated an unordered queryset, which can repeat or drop a row between pages. Added explicit ordering. | — |
 | `tools/rebuild_migration_baseline.py` | `rebuild()` swept the module-level `MIGRATIONS_DIR` rather than the baseline's own directory, so a caller that redirected `BASELINE` still deleted the real migrations. Now derived from `BASELINE.parent`. | 9.2 |
 
-### Repository note
-
-Commit `54c1222` ("merge remote and update backend fixes") was made with unresolved
-conflicts still in the tree, so `<<<<<<<` markers were committed into 15 files and
-`settings.py` would not import. That is already fixed on `main`.
-`tools/resolve_committed_conflicts.py` records the resolution rule and can re-check the
-tree if it happens again — run it with `--check` first.
-
-If you see a branch named `fix/resolve-merge-conflicts-and-spec-status` on the remote,
-do not merge it. It fixes the same problem but is based on the broken `54c1222`, and
-`main` already carries an equivalent fix plus `core/authentication.py` and
-`core/migrations/0002_alter_memberprofile_options.py`, which that branch would revert.
-It can be deleted.
+### Migration baseline note
 
 Migration `0002_alter_memberprofile_options.py` no longer exists. Task 5.2 regenerated
 the baseline, and requirement 9.1 asks for a *single* replacement migration, so the
