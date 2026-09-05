@@ -195,19 +195,26 @@ RECOVERY_LLM_MODEL=gpt-4o-mini
 OPENAI_API_KEY=<key>
 ```
 
-or, against a free OpenAI-compatible tier:
+or, against Groq's free tier (no card, OpenAI-compatible):
 
 ```
 RECOVERY_LLM_CLIENT=core.services.recovery_agent.OpenAIToolCallingClient
 RECOVERY_LLM_BASE_URL=https://api.groq.com/openai/v1
-RECOVERY_LLM_MODEL=llama-3.3-70b-versatile
+RECOVERY_LLM_MODEL=openai/gpt-oss-120b
 OPENAI_API_KEY=<key>
 ```
 
-The report's `Planner` line names whichever one answered, so a run cannot quietly
-claim a model it did not use. `tool_choice` defaults to `required` because a planner
-that answers in prose has not made a decision; set `RECOVERY_LLM_TOOL_CHOICE=auto` if
-a provider rejects it, and a reply carrying no tool call is still treated as unusable.
+Verified end to end on that configuration: an 8-invoice, 4-round batch planned entirely
+by the hosted model, `Planner : openai` in the report and no `planner fallbacks` line,
+`Rs.14,372.40` recovered of `Rs.17,464.00`, reconciling every round. Groq rotates its
+catalogue, so if a model name 404s, list what your key can reach with
+`client.models.list()` and pick a tool-calling model.
+
+The report's `Planner` line names whichever planner answered and a fallback is counted
+and printed, so a run cannot quietly claim a model it did not use. `tool_choice`
+defaults to `required` because a planner that answers in prose has not made a decision;
+set `RECOVERY_LLM_TOOL_CHOICE=auto` if a provider rejects it, and a reply carrying no
+tool call is still treated as unusable.
 
 None of this widens what the agent may do. The tenant boundary, the discount cap, the
 one-discount rule and the stopping rule all run in Python after the planner has
