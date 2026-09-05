@@ -177,6 +177,42 @@ scripted planner into. It defaults to an offline deterministic planner, so a bat
 runs with no API key and no network, and so the guardrail path under test is
 identical either way.
 
+### Using a real model
+
+`OpenAIToolCallingClient` speaks the OpenAI chat-completions tool-calling API but is
+not tied to OpenAI. `RECOVERY_LLM_BASE_URL` points the same SDK at any provider
+implementing that surface, so which model plans is configuration, not code.
+
+```
+pip install openai
+```
+
+then in `.env`, either
+
+```
+RECOVERY_LLM_CLIENT=core.services.recovery_agent.OpenAIToolCallingClient
+RECOVERY_LLM_MODEL=gpt-4o-mini
+OPENAI_API_KEY=<key>
+```
+
+or, against a free OpenAI-compatible tier:
+
+```
+RECOVERY_LLM_CLIENT=core.services.recovery_agent.OpenAIToolCallingClient
+RECOVERY_LLM_BASE_URL=https://api.groq.com/openai/v1
+RECOVERY_LLM_MODEL=llama-3.3-70b-versatile
+OPENAI_API_KEY=<key>
+```
+
+The report's `Planner` line names whichever one answered, so a run cannot quietly
+claim a model it did not use. `tool_choice` defaults to `required` because a planner
+that answers in prose has not made a decision; set `RECOVERY_LLM_TOOL_CHOICE=auto` if
+a provider rejects it, and a reply carrying no tool call is still treated as unusable.
+
+None of this widens what the agent may do. The tenant boundary, the discount cap, the
+one-discount rule and the stopping rule all run in Python after the planner has
+spoken, which is the whole point: the guardrails hold whichever model is answering.
+
 ## Tests
 
 ```
@@ -221,12 +257,12 @@ load-bearing.
 
 ## Honest limitations
 
-- The default planner is the offline deterministic `HeuristicRecoveryPlanner`, so
-  the demo needs no API key. A hosted OpenAI tool-calling planner is wired via
-  `get_llm_client()` / `OpenAIToolCallingClient` but needs `OPENAI_API_KEY` and
-  `pip install openai` to exercise live. `openai` is intentionally not a declared
-  dependency: the import is lazy and every failure normalises to `LLMUnavailable`,
-  which falls back to the deterministic planner rather than abandoning the invoice.
+- The default planner is the offline deterministic `HeuristicRecoveryPlanner`, so the
+  demo needs no API key and opens no socket. A hosted planner is wired and one
+  settings change away (see below), but the figures quoted above are from the
+  deterministic one. `openai` is intentionally not a declared dependency: the import
+  is lazy and every failure normalises to `LLMUnavailable`, which falls back to the
+  deterministic planner rather than abandoning the invoice.
 - `--synthetic-data` simulates whether a member pays. That is a stated model, not a
   collection observation, and the report labels the mode on every run.
 - `--live` performs real recovery actions and leaves collection measurement to

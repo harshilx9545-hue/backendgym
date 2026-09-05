@@ -235,10 +235,19 @@ SAAS_INVOICE_LEAD_DAYS = config.env_int("SAAS_INVOICE_LEAD_DAYS", 7)
 # To use a hosted model instead:
 #   pip install openai
 #   RECOVERY_LLM_CLIENT=core.services.recovery_agent.OpenAIToolCallingClient
-#   OPENAI_API_KEY=sk-...
+#   OPENAI_API_KEY=<key>
+#
+# The planner speaks the OpenAI chat-completions tool-calling API but is not tied to
+# OpenAI: RECOVERY_LLM_BASE_URL points the same SDK at any provider implementing that
+# surface, so which model answers is a settings change rather than a code change.
 RECOVERY_LLM_CLIENT = config.env_str("RECOVERY_LLM_CLIENT")
 RECOVERY_LLM_MODEL = config.env_str("RECOVERY_LLM_MODEL", "gpt-4o-mini")
 OPENAI_API_KEY = config.env_str("OPENAI_API_KEY", "")
+RECOVERY_LLM_BASE_URL = config.env_str("RECOVERY_LLM_BASE_URL", "")
+# `required` forces the planner to call a tool. Some OpenAI-compatible providers
+# accept only `auto`; a planner that returns no tool call is treated as unusable and
+# the deterministic planner takes the invoice, so the guardrails do not depend on this.
+RECOVERY_LLM_TOOL_CHOICE = config.env_str("RECOVERY_LLM_TOOL_CHOICE", "required")
 
 # Where a recovery payment link points. The Razorpay adapter here exposes *orders*
 # rather than hosted Payment Links, so the link addresses the platform's own checkout

@@ -557,7 +557,13 @@ class HeuristicRecoveryPlanner:
 
 
 class OpenAIToolCallingClient:
-    """Hosted planner using the OpenAI chat-completions tool-calling API.
+    """Hosted planner speaking the OpenAI chat-completions tool-calling API.
+
+    Not tied to OpenAI. `base_url` points the official `openai` SDK at any provider
+    that implements the same surface - Groq, Together, OpenRouter, a local server -
+    which matters because the guardrails are what this project is demonstrating and
+    they must be shown to hold whichever model is answering. Swapping the planner is a
+    settings change, not a code change.
 
     `openai` is not a declared dependency of this project, so the import is lazy and
     every failure - missing package, missing key, refusal, malformed arguments - is
@@ -567,22 +573,44 @@ class OpenAIToolCallingClient:
 
     name = "openai"
 
-    def __init__(self, *, model=None, api_key=None, client=None, temperature=0):
+    def __init__(
+        self,
+        *,
+        model=None,
+        api_key=None,
+        client=None,
+        temperature=0,
+        base_url=None,
+        tool_choice=None,
+    ):
         self.model = model or getattr(settings, "RECOVERY_LLM_MODEL", DEFAULT_LLM_MODEL)
         self.temperature = temperature
         self._api_key = api_key or getattr(settings, "OPENAI_API_KEY", "")
+        self._base_url = base_url or getattr(settings, "RECOVERY_LLM_BASE_URL", "") or None
+        # `required` forces a tool call, which is what this agent wants: a planner that
+        # answers in prose has not made a decision. Configurable because the
+        # OpenAI-compatible providers do not all accept every value, and a provider
+        # that rejects `required` should be settable to `auto` rather than needing a
+        # patch. An `auto` planner that returns no tool call is treated as unusable
+        # below, so the stricter behaviour is preserved either way.
+        self.tool_choice = (
+            tool_choice or getattr(settings, "RECOVERY_LLM_TOOL_CHOICE", "") or "required"
+        )
         self._client = client
 
     def _resolve_client(self):
         if self._client is not None:
             return self._client
         if not self._api_key:
-            raise LLMUnavailable("No OpenAI API key is configured.")
+            raise LLMUnavailable("No recovery planner API key is configured.")
         try:
             from openai import OpenAI
         except ImportError as exc:  # pragma: no cover - optional dependency
             raise LLMUnavailable("The openai package is not installed.") from exc
-        self._client = OpenAI(api_key=self._api_key)
+        kwargs = {"api_key": self._api_key}
+        if self._base_url:
+            kwargs["base_url"] = self._base_url
+        self._client = OpenAI(**kwargs)
         return self._client
 
     def complete(self, *, messages, tools=None, context=None):
@@ -592,10 +620,14 @@ class OpenAIToolCallingClient:
                 model=self.model,
                 messages=messages,
                 tools=tools or TOOL_SCHEMAS,
-                tool_choice="required",
+                tool_choice=self.tool_choice,
                 temperature=self.temperature,
             )
             message = response.choices[0].message
+            # An empty `tool_calls` is an IndexError here, which the except below
+            # normalises to LLMUnavailable. That is the intended handling: a planner
+            # that answered in prose rather than calling a tool has not made a
+            # decision, so the deterministic planner takes the invoice instead.
             call = (message.tool_calls or [])[0]
             arguments = json.loads(call.function.arguments or "{}")
         except LLMUnavailable:
