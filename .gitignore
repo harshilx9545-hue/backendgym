@@ -18,5 +18,9 @@ media/
 
 # Local run captures (demo output, test logs)
 demo_output.txt
+demo_footage.txt
+take*.txt
+chk.txt
+inj*.txt
 test_*.txt
 _*.txt
