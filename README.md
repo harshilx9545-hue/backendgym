@@ -353,12 +353,12 @@ process will not boot:
 
 ## Credits
 
-Built together by [@sarthak210107png](https://github.com/sarthak210107png) and
+Built together by [@sarthak210107-png](https://github.com/sarthak210107-png) and
 [@harshilx9545-hue](https://github.com/harshilx9545-hue), each owning a part.
 
 | Who | What |
 |---|---|
-| **Sarthak** ([@sarthak210107png](https://github.com/sarthak210107png)) | The AI revenue recovery agent: tool schemas and the planner seam, the four guardrails, the append-only `RecoveryAttempt` ledger, the measured batch report, and the prompt-injection demonstration |
+| **Sarthak** ([@sarthak210107-png](https://github.com/sarthak210107-png)) | The AI revenue recovery agent: tool schemas and the planner seam, the four guardrails, the append-only `RecoveryAttempt` ledger, the measured batch report, and the prompt-injection demonstration |
 | **Harshil** ([@harshilx9545-hue](https://github.com/harshilx9545-hue)) | The multi-tenant gym SaaS platform the agent runs on: tenancy and query scoping, JWT auth, per-gym invoice numbering, GST computation, the Razorpay gateway adapter and webhook handling, and the append-only audit trail |
 
 The recovery agent is the Track 03 submission. The platform is what makes its safety
